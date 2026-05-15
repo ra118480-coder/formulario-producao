@@ -12,96 +12,58 @@
     <style>
 
         body {
-
-            font-family: Arial, sans-serif;
-
+            font-family: Arial;
             background: #f4f4f4;
-
-            margin: 0;
-
-            padding: 40px;
+            padding: 30px;
         }
 
         .container {
-
-            max-width: 700px;
-
+            max-width: 750px;
             margin: auto;
-
             background: white;
-
-            padding: 30px;
-
+            padding: 20px;
             border-radius: 10px;
-
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
         }
 
-        h1 {
-
+        h2 {
             text-align: center;
-
-            margin-bottom: 30px;
         }
 
         .campo {
-
-            margin-bottom: 20px;
+            margin-bottom: 15px;
         }
 
         label {
-
-            display: block;
-
-            margin-bottom: 8px;
-
             font-weight: bold;
         }
 
-        select,
-        input,
-        textarea {
-
+        select, input, textarea {
             width: 100%;
-
-            padding: 12px;
-
-            border: 1px solid #ccc;
-
-            border-radius: 5px;
-
-            font-size: 14px;
-        }
-
-        textarea {
-
-            resize: vertical;
-
-            min-height: 100px;
+            padding: 10px;
+            margin-top: 5px;
         }
 
         button {
-
+            padding: 10px;
             width: 100%;
-
-            padding: 15px;
-
-            border: none;
-
-            background: #007bff;
-
+            background: blue;
             color: white;
-
-            font-size: 16px;
-
-            border-radius: 5px;
-
+            border: none;
             cursor: pointer;
         }
 
-        button:hover {
+        .comentarios {
+            margin-top: 10px;
+        }
 
-            background: #0056b3;
+        .comentario-item {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 5px;
+        }
+
+        .comentario-item input {
+            flex: 1;
         }
 
     </style>
@@ -110,127 +72,110 @@
 
 <body>
 
-    <div class="container">
+<div class="container">
 
-        <h1>Formulário de Modulações</h1>
+    <h2>Formulário de Modulações</h2>
 
-        <form id="formulario">
+    <form id="formulario">
 
-            <!-- FEIRA -->
-            <div class="campo">
+        <!-- FEIRA -->
+        <div class="campo">
+            <label>Feira</label>
+            <select id="modelo"></select>
+        </div>
 
-                <label>Feira / Coleção</label>
+        <!-- PRODUTO -->
+        <div class="campo">
+            <label>Produto</label>
+            <select id="modulacao"></select>
+        </div>
 
-                <select id="modelo" required>
+        <!-- MODULAÇÃO -->
+        <div class="campo">
+            <label>Modulação</label>
+            <select id="variavel"></select>
+        </div>
 
-                    <option value="">
-                        Selecione
-                    </option>
+        <!-- SETOR -->
+        <div class="campo">
+            <label>Setor</label>
+            <select id="setor">
+                <option>Produção</option>
+                <option>Engenharia</option>
+                <option>Qualidade</option>
+                <option>Comercial</option>
+            </select>
+        </div>
 
-                </select>
+        <!-- VERSÃO -->
+        <div class="campo">
+            <label>Versão</label>
+            <select id="versao">
+                <option>1.0</option>
+                <option>1.1</option>
+                <option>2.0</option>
+                <option>3.0</option>
+            </select>
+        </div>
 
-            </div>
+        <!-- MELHORIA -->
+        <div class="campo">
+            <label>Melhoria</label>
+            <select id="melhoria">
+                <option>Sim</option>
+                <option>Não</option>
+            </select>
+        </div>
 
+        <!-- COMENTÁRIOS MÚLTIPLOS -->
+        <div class="campo">
 
-            <!-- PRODUTO -->
-            <div class="campo">
+            <label>Comentários</label>
 
-                <label>Produto</label>
+            <div id="comentarios" class="comentarios"></div>
 
-                <select id="modulacao" required>
-
-                    <option value="">
-                        Selecione
-                    </option>
-
-                </select>
-
-            </div>
-
-
-            <!-- MODULACAO -->
-            <div class="campo">
-
-                <label>Modulação</label>
-
-                <select id="variavel" required>
-
-                    <option value="">
-                        Selecione
-                    </option>
-
-                </select>
-
-            </div>
-
-
-            <!-- SETOR -->
-            <div class="campo">
-
-                <label>Setor</label>
-
-                <input
-                    type="text"
-                    id="setor"
-                    required
-                >
-
-            </div>
-
-
-            <!-- VERSAO -->
-            <div class="campo">
-
-                <label>Versão</label>
-
-                <input
-                    type="text"
-                    id="versao"
-                    required
-                >
-
-            </div>
-
-
-            <!-- MELHORIA -->
-            <div class="campo">
-
-                <label>Melhoria</label>
-
-                <input
-                    type="text"
-                    id="melhoria"
-                    required
-                >
-
-            </div>
-
-
-            <!-- DESCRICAO -->
-            <div class="campo">
-
-                <label>Descrição</label>
-
-                <textarea
-                    id="descricao"
-                    required
-                ></textarea>
-
-            </div>
-
-
-            <!-- BOTAO -->
-            <button type="submit">
-
-                Salvar Registro
-
+            <button type="button" onclick="adicionarComentario()">
+                + Adicionar comentário
             </button>
 
-        </form>
+        </div>
 
-    </div>
+        <!-- DESCRIÇÃO -->
+        <div class="campo">
+            <label>Descrição Geral</label>
+            <textarea id="descricao"></textarea>
+        </div>
 
-    <script src="/static/script.js"></script>
+        <!-- FOTO -->
+        <div class="campo">
+            <label>Imagem (opcional)</label>
+            <input type="file" id="imagem" accept="image/*">
+        </div>
+
+        <button type="submit">Salvar</button>
+
+    </form>
+
+</div>
+
+<script src="/static/script.js"></script>
+
+<script>
+
+function adicionarComentario() {
+
+    const div = document.getElementById("comentarios")
+
+    const input = document.createElement("input")
+
+    input.type = "text"
+
+    input.placeholder = "Digite um comentário"
+
+    div.appendChild(input)
+}
+
+</script>
 
 </body>
 
