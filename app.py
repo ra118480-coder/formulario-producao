@@ -1,182 +1,134 @@
 from flask import Flask, render_template, jsonify, request
+import pandas as pd
 import sqlite3
-from datetime import datetime
+import os
 
 app = Flask(__name__)
 
+ARQUIVO_EXCEL = "registros.xlsx"
 
-# ==================================
-# CONEXAO
-# ==================================
+
+# =========================
+# CONEXÃO BANCO (modulações)
+# =========================
 def conectar():
-
     conn = sqlite3.connect("produtos.db")
-
     conn.row_factory = sqlite3.Row
-
     return conn
 
 
-# ==================================
+# =========================
 # HOME
-# ==================================
+# =========================
 @app.route("/")
 def home():
-
     return render_template("index.html")
 
 
-# ==================================
-# FEIRAS / COLECOES
-# ==================================
+# =========================
+# FEIRAS
+# =========================
 @app.route("/api/feiras")
 def feiras():
 
     conn = conectar()
 
-    cursor = conn.execute("""
-
+    dados = conn.execute("""
         SELECT DISTINCT colecao
         FROM produtos
         ORDER BY colecao
-
-    """)
-
-    dados = [x[0] for x in cursor.fetchall()]
+    """).fetchall()
 
     conn.close()
 
-    return jsonify(dados)
+    return jsonify([x[0] for x in dados])
 
 
-# ==================================
+# =========================
 # PRODUTOS
-# ==================================
+# =========================
 @app.route("/api/produtos/<feira>")
 def produtos(feira):
 
     conn = conectar()
 
-    cursor = conn.execute("""
-
+    dados = conn.execute("""
         SELECT DISTINCT desc_tecnica
         FROM produtos
         WHERE colecao = ?
         ORDER BY desc_tecnica
-
-    """, (feira,))
-
-    dados = [x[0] for x in cursor.fetchall()]
+    """, (feira,)).fetchall()
 
     conn.close()
 
-    return jsonify(dados)
+    return jsonify([x[0] for x in dados])
 
 
-# ==================================
-# MODULACOES
-# ==================================
+# =========================
+# MODULAÇÕES
+# =========================
 @app.route("/api/modulacoes/<feira>/<produto>")
 def modulacoes(feira, produto):
 
     conn = conectar()
 
-    cursor = conn.execute("""
-
+    dados = conn.execute("""
         SELECT DISTINCT variavel
         FROM produtos
         WHERE colecao = ?
         AND desc_tecnica = ?
         ORDER BY variavel
-
-    """, (feira, produto))
-
-    dados = [x[0] for x in cursor.fetchall()]
+    """, (feira, produto)).fetchall()
 
     conn.close()
 
-    return jsonify(dados)
+    return jsonify([x[0] for x in dados])
 
 
-# ==================================
-# SALVAR
-# ==================================
+# =========================
+# SALVAR NO EXCEL
+# =========================
 @app.route("/api/salvar", methods=["POST"])
 def salvar():
 
     dados = request.json
 
-    conn = conectar()
+    nova_linha = {
 
-    conn.execute("""
+        "feira": dados.get("feira"),
+        "produto": dados.get("produto"),
+        "modulacao": dados.get("modulacao"),
 
-        CREATE TABLE IF NOT EXISTS registros (
+        "setor": dados.get("setor"),
+        "classificacao": dados.get("classificacao"),
+        "tipo": dados.get("melhoria"),
 
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
+        "descricao": dados.get("descricao"),
 
-            feira TEXT,
+        # futuro SharePoint
+        "imagem_url": dados.get("imagem_url")
 
-            produto TEXT,
+    }
 
-            modulacao TEXT,
+    # cria arquivo se não existir
+    if not os.path.exists(ARQUIVO_EXCEL):
 
-            setor TEXT,
+        df = pd.DataFrame([nova_linha])
+        df.to_excel(ARQUIVO_EXCEL, index=False)
 
-            versao TEXT,
+    else:
 
-            melhoria TEXT,
+        df = pd.read_excel(ARQUIVO_EXCEL)
+        df = pd.concat([df, pd.DataFrame([nova_linha])], ignore_index=True)
+        df.to_excel(ARQUIVO_EXCEL, index=False)
 
-            descricao TEXT,
-
-            data_registro TEXT
-        )
-
-    """)
-
-    conn.execute("""
-
-        INSERT INTO registros (
-
-            feira,
-            produto,
-            modulacao,
-            setor,
-            versao,
-            melhoria,
-            descricao,
-            data_registro
-
-        )
-
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-
-    """, (
-
-        dados["feira"],
-        dados["produto"],
-        dados["modulacao"],
-        dados["setor"],
-        dados["versao"],
-        dados["melhoria"],
-        dados["descricao"],
-        datetime.now().strftime("%d/%m/%Y %H:%M")
-
-    ))
-
-    conn.commit()
-
-    conn.close()
-
-    return jsonify({
-        "status": "ok"
-    })
+    return jsonify({"status": "ok"})
 
 
-# ==================================
-# RODAR
-# ==================================
+# =========================
+# RUN
+# =========================
 if __name__ == "__main__":
-
     app.run(
         host="0.0.0.0",
         port=10000
