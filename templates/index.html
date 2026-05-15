@@ -3,70 +3,69 @@
 
 <head>
 
-    <meta charset="UTF-8">
+<meta charset="UTF-8">
 
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Formulário de Modulações</title>
+<title>Formulário de Modulações</title>
 
-    <style>
+<style>
 
-        body {
-            font-family: Arial;
-            background: #f4f4f4;
-            padding: 30px;
-        }
+body {
+    font-family: Arial;
+    background: #f4f4f4;
+    padding: 30px;
+}
 
-        .container {
-            max-width: 750px;
-            margin: auto;
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-        }
+.container {
+    max-width: 800px;
+    margin: auto;
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+}
 
-        h2 {
-            text-align: center;
-        }
+h2 {
+    text-align: center;
+}
 
-        .campo {
-            margin-bottom: 15px;
-        }
+.campo {
+    margin-bottom: 15px;
+}
 
-        label {
-            font-weight: bold;
-        }
+label {
+    font-weight: bold;
+}
 
-        select, input, textarea {
-            width: 100%;
-            padding: 10px;
-            margin-top: 5px;
-        }
+select, input, textarea {
+    width: 100%;
+    padding: 10px;
+    margin-top: 5px;
+}
 
-        button {
-            padding: 10px;
-            width: 100%;
-            background: blue;
-            color: white;
-            border: none;
-            cursor: pointer;
-        }
+.bloco {
+    border: 1px solid #ddd;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 8px;
+    background: #fafafa;
+}
 
-        .comentarios {
-            margin-top: 10px;
-        }
+button {
+    padding: 10px;
+    width: 100%;
+    background: blue;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
 
-        .comentario-item {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 5px;
-        }
+.add {
+    background: green;
+    margin-top: 5px;
+}
 
-        .comentario-item input {
-            flex: 1;
-        }
-
-    </style>
+</style>
 
 </head>
 
@@ -74,108 +73,108 @@
 
 <div class="container">
 
-    <h2>Formulário de Modulações</h2>
+<h2>Formulário de Modulações</h2>
 
-    <form id="formulario">
+<form id="formulario">
 
-        <!-- FEIRA -->
-        <div class="campo">
-            <label>Feira</label>
-            <select id="modelo"></select>
-        </div>
+<!-- FEIRA -->
+<div class="campo">
+<label>Feira</label>
+<select id="modelo"></select>
+</div>
 
-        <!-- PRODUTO -->
-        <div class="campo">
-            <label>Produto</label>
-            <select id="modulacao"></select>
-        </div>
+<!-- PRODUTO -->
+<div class="campo">
+<label>Produto</label>
+<select id="modulacao"></select>
+</div>
 
-        <!-- MODULAÇÃO -->
-        <div class="campo">
-            <label>Modulação</label>
-            <select id="variavel"></select>
-        </div>
+<!-- MODULAÇÃO -->
+<div class="campo">
+<label>Modulação</label>
+<select id="variavel"></select>
+</div>
 
-        <!-- SETOR -->
-        <div class="campo">
-            <label>Setor</label>
-            <select id="setor">
-                <option>Produção</option>
-                <option>Engenharia</option>
-                <option>Qualidade</option>
-                <option>Comercial</option>
-            </select>
-        </div>
+<!-- SETOR -->
+<div class="campo">
+<label>Setor</label>
+<select id="setor">
 
-        <!-- VERSÃO -->
-        <div class="campo">
-            <label>Versão</label>
-            <select id="versao">
-                <option>1.0</option>
-                <option>1.1</option>
-                <option>2.0</option>
-                <option>3.0</option>
-            </select>
-        </div>
+<option>Madeira</option>
+<option>Espuma</option>
+<option>Tecido</option>
 
-        <!-- MELHORIA -->
-        <div class="campo">
-            <label>Melhoria</label>
-            <select id="melhoria">
-                <option>Sim</option>
-                <option>Não</option>
-            </select>
-        </div>
+</select>
+</div>
 
-        <!-- COMENTÁRIOS MÚLTIPLOS -->
-        <div class="campo">
+<!-- CLASSIFICAÇÃO -->
+<div class="campo">
+<label>Classificação de Alteração</label>
+<select id="classificacao">
 
-            <label>Comentários</label>
+<option>Produto em linha</option>
+<option>Validação</option>
 
-            <div id="comentarios" class="comentarios"></div>
+</select>
+</div>
 
-            <button type="button" onclick="adicionarComentario()">
-                + Adicionar comentário
-            </button>
+<!-- MELHORIA -->
+<div class="campo">
+<label>Tipo</label>
+<select id="melhoria">
 
-        </div>
+<option>Informacional</option>
+<option>Melhoria</option>
 
-        <!-- DESCRIÇÃO -->
-        <div class="campo">
-            <label>Descrição Geral</label>
-            <textarea id="descricao"></textarea>
-        </div>
+</select>
+</div>
 
-        <!-- FOTO -->
-        <div class="campo">
-            <label>Imagem (opcional)</label>
-            <input type="file" id="imagem" accept="image/*">
-        </div>
+<!-- BLOCOS DINÂMICOS -->
+<div class="campo">
+<label>Comentários + Fotos</label>
 
-        <button type="submit">Salvar</button>
+<div id="blocos"></div>
 
-    </form>
+<button type="button" class="add" onclick="addBloco()">
+Adicionar novo bloco
+</button>
 
 </div>
 
-<script src="/static/script.js"></script>
+<button type="submit">Salvar</button>
+
+</form>
+
+</div>
 
 <script>
 
-function adicionarComentario() {
+function addBloco() {
 
-    const div = document.getElementById("comentarios")
+const div = document.getElementById("blocos")
 
-    const input = document.createElement("input")
+const bloco = document.createElement("div")
 
-    input.type = "text"
+bloco.className = "bloco"
 
-    input.placeholder = "Digite um comentário"
+bloco.innerHTML = `
 
-    div.appendChild(input)
+<textarea placeholder="Comentário"></textarea>
+
+<input type="file" accept="image/*">
+
+`
+
+div.appendChild(bloco)
+
 }
 
+// adicionar primeiro bloco automático
+addBloco()
+
 </script>
+
+<script src="/static/script.js"></script>
 
 </body>
 
