@@ -1,5 +1,5 @@
 flask
 pandas
 openpyxl
-requests
 gunicorn
+requests
