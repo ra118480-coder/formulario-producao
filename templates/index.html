@@ -3,163 +3,235 @@
 
 <head>
 
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
 
-<title>Registro de Produção</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<style>
+    <title>Formulário de Modulações</title>
 
-body{
-    font-family:Arial;
-    background:#f4f4f4;
-    padding:40px;
-}
+    <style>
 
-.container{
-    max-width:700px;
-    margin:auto;
-    background:white;
-    padding:30px;
-    border-radius:12px;
-    box-shadow:0 0 10px rgba(0,0,0,0.1);
-}
+        body {
 
-h1{
-    margin-bottom:30px;
-}
+            font-family: Arial, sans-serif;
 
-.field{
-    margin-bottom:20px;
-}
+            background: #f4f4f4;
 
-label{
-    display:block;
-    margin-bottom:8px;
-    font-weight:bold;
-}
+            margin: 0;
 
-input,
-select,
-textarea{
-    width:100%;
-    padding:12px;
-    border:1px solid #ccc;
-    border-radius:8px;
-    font-size:15px;
-}
+            padding: 40px;
+        }
 
-textarea{
-    height:120px;
-}
+        .container {
 
-button{
-    background:#111827;
-    color:white;
-    border:none;
-    padding:14px 20px;
-    border-radius:8px;
-    cursor:pointer;
-    font-size:15px;
-}
+            max-width: 700px;
 
-button:hover{
-    opacity:0.9;
-}
+            margin: auto;
 
-.lista{
-    margin-top:40px;
-}
+            background: white;
 
-.card{
-    background:#fafafa;
-    border:1px solid #ddd;
-    padding:15px;
-    border-radius:10px;
-    margin-bottom:10px;
-}
+            padding: 30px;
 
-</style>
+            border-radius: 10px;
+
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+
+            text-align: center;
+
+            margin-bottom: 30px;
+        }
+
+        .campo {
+
+            margin-bottom: 20px;
+        }
+
+        label {
+
+            display: block;
+
+            margin-bottom: 8px;
+
+            font-weight: bold;
+        }
+
+        select,
+        input,
+        textarea {
+
+            width: 100%;
+
+            padding: 12px;
+
+            border: 1px solid #ccc;
+
+            border-radius: 5px;
+
+            font-size: 14px;
+        }
+
+        textarea {
+
+            resize: vertical;
+
+            min-height: 100px;
+        }
+
+        button {
+
+            width: 100%;
+
+            padding: 15px;
+
+            border: none;
+
+            background: #007bff;
+
+            color: white;
+
+            font-size: 16px;
+
+            border-radius: 5px;
+
+            cursor: pointer;
+        }
+
+        button:hover {
+
+            background: #0056b3;
+        }
+
+    </style>
 
 </head>
 
 <body>
 
-<div class="container">
+    <div class="container">
 
-<h1>Registro de Produção</h1>
+        <h1>Formulário de Modulações</h1>
 
-<div class="field">
-<label>Modelo</label>
-<select id="modelo"></select>
-</div>
+        <form id="formulario">
 
-<div class="field">
-<label>Modulação</label>
-<select id="modulacao"></select>
-</div>
+            <!-- FEIRA -->
+            <div class="campo">
 
-<div class="field">
-<label>Setor</label>
+                <label>Feira / Coleção</label>
 
-<select id="setor">
-<option>Montagem</option>
-<option>Tecido</option>
-<option>Espuma</option>
-</select>
+                <select id="modelo" required>
 
-</div>
+                    <option value="">
+                        Selecione
+                    </option>
 
-<div class="field">
+                </select>
 
-<label>Versão</label>
+            </div>
 
-<select id="versao">
-<option>v1</option>
-<option>v2</option>
-<option>v3</option>
-<option>v4</option>
-<option>v5</option>
-</select>
 
-</div>
+            <!-- PRODUTO -->
+            <div class="campo">
 
-<div class="field">
+                <label>Produto</label>
 
-<label>Tipo de melhoria</label>
+                <select id="modulacao" required>
 
-<select id="melhoria">
-<option>Estética</option>
-<option>Estrutural</option>
-<option>Qualidade</option>
-<option>Processo</option>
-</select>
+                    <option value="">
+                        Selecione
+                    </option>
 
-</div>
+                </select>
 
-<div class="field">
+            </div>
 
-<label>Descrição</label>
 
-<textarea id="descricao"></textarea>
+            <!-- MODULACAO -->
+            <div class="campo">
 
-</div>
+                <label>Modulação</label>
 
-<button onclick="salvar()">
-Salvar Registro
-</button>
+                <select id="variavel" required>
 
-<div class="lista">
+                    <option value="">
+                        Selecione
+                    </option>
 
-<h2>Últimos registros</h2>
+                </select>
 
-<div id="lista"></div>
+            </div>
 
-</div>
 
-</div>
+            <!-- SETOR -->
+            <div class="campo">
 
-<script src="/static/script.js"></script>
+                <label>Setor</label>
+
+                <input
+                    type="text"
+                    id="setor"
+                    required
+                >
+
+            </div>
+
+
+            <!-- VERSAO -->
+            <div class="campo">
+
+                <label>Versão</label>
+
+                <input
+                    type="text"
+                    id="versao"
+                    required
+                >
+
+            </div>
+
+
+            <!-- MELHORIA -->
+            <div class="campo">
+
+                <label>Melhoria</label>
+
+                <input
+                    type="text"
+                    id="melhoria"
+                    required
+                >
+
+            </div>
+
+
+            <!-- DESCRICAO -->
+            <div class="campo">
+
+                <label>Descrição</label>
+
+                <textarea
+                    id="descricao"
+                    required
+                ></textarea>
+
+            </div>
+
+
+            <!-- BOTAO -->
+            <button type="submit">
+
+                Salvar Registro
+
+            </button>
+
+        </form>
+
+    </div>
+
+    <script src="/static/script.js"></script>
 
 </body>
+
 </html>
