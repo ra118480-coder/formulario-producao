@@ -10,7 +10,7 @@ ARQUIVO_EXCEL = "registros.xlsx"
 
 
 # =========================
-# CONEXÃO SQLITE
+# BANCO SQLITE (FONTE CASCATA)
 # =========================
 def conectar():
     conn = sqlite3.connect("produtos.db")
@@ -59,7 +59,8 @@ def upload_sharepoint(file_bytes, filename):
         if r.status_code in [200, 201]:
             return r.json().get("webUrl")
 
-    except:
+    except Exception as e:
+        print("Erro SharePoint:", e)
         return None
 
 
@@ -76,6 +77,7 @@ def home():
 # =========================
 @app.route("/api/feiras")
 def feiras():
+
     conn = conectar()
 
     dados = conn.execute("""
@@ -127,22 +129,21 @@ def modulacoes(feira, produto):
 
 
 # =========================
-# SALVAR EXCEL + SHAREPOINT
+# SALVAR (EXCEL + HISTÓRICO SEGURO)
 # =========================
 @app.route("/api/salvar", methods=["POST"])
 def salvar():
 
     dados = request.form.to_dict()
-
     file = request.files.get("imagem")
 
     imagem_url = None
 
+    # upload imagem
     if file:
         imagem_url = upload_sharepoint(file.read(), file.filename)
 
     nova_linha = {
-
         "feira": dados.get("feira"),
         "produto": dados.get("produto"),
         "modulacao": dados.get("modulacao"),
@@ -152,27 +153,41 @@ def salvar():
         "tipo": dados.get("melhoria"),
 
         "descricao": dados.get("descricao"),
-
         "imagem_url": imagem_url
-
     }
 
-    if not os.path.exists(ARQUIVO_EXCEL):
+    # =========================
+    # GARANTIR QUE NUNCA PERDE HISTÓRICO
+    # =========================
+    try:
 
-        df = pd.DataFrame([nova_linha])
+        if os.path.exists(ARQUIVO_EXCEL):
+
+            df = pd.read_excel(ARQUIVO_EXCEL)
+
+            # adiciona nova linha sem sobrescrever
+            df = pd.concat([df, pd.DataFrame([nova_linha])], ignore_index=True)
+
+        else:
+            df = pd.DataFrame([nova_linha])
+
+        # salva sempre acumulando histórico
         df.to_excel(ARQUIVO_EXCEL, index=False)
 
-    else:
+    except Exception as e:
+        return jsonify({
+            "status": "erro",
+            "msg": str(e)
+        })
 
-        df = pd.read_excel(ARQUIVO_EXCEL)
-        df = pd.concat([df, pd.DataFrame([nova_linha])], ignore_index=True)
-        df.to_excel(ARQUIVO_EXCEL, index=False)
-
-    return jsonify({"status": "ok", "imagem": imagem_url})
+    return jsonify({
+        "status": "ok",
+        "imagem": imagem_url
+    })
 
 
 # =========================
-# RUN
+# START
 # =========================
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=10000)
