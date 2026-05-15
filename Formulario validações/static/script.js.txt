@@ -1,0 +1,150 @@
+const modelo = document.getElementById("modelo")
+
+const modulacao = document.getElementById("modulacao")
+
+
+// =========================
+// CARREGAR MODELOS
+// =========================
+async function carregarModelos(){
+
+    const resposta = await fetch("/api/modelos")
+
+    const dados = await resposta.json()
+
+    modelo.innerHTML = ""
+
+    dados.forEach(item => {
+
+        modelo.innerHTML += `
+            <option value="${item}">
+                ${item}
+            </option>
+        `
+    })
+
+    carregarModulacoes()
+}
+
+
+// =========================
+// CARREGAR MODULACOES
+// =========================
+async function carregarModulacoes(){
+
+    const modeloSelecionado = modelo.value
+
+    const resposta = await fetch(
+        `/api/modulacoes/${modeloSelecionado}`
+    )
+
+    const dados = await resposta.json()
+
+    modulacao.innerHTML = ""
+
+    dados.forEach(item => {
+
+        modulacao.innerHTML += `
+            <option value="${item}">
+                ${item}
+            </option>
+        `
+    })
+}
+
+
+// =========================
+// EVENTO CASCATA
+// =========================
+modelo.addEventListener(
+    "change",
+    carregarModulacoes
+)
+
+
+// =========================
+// SALVAR
+// =========================
+async function salvar(){
+
+    const dados = {
+
+        modelo: modelo.value,
+
+        modulacao: modulacao.value,
+
+        setor: document.getElementById("setor").value,
+
+        versao: document.getElementById("versao").value,
+
+        melhoria: document.getElementById("melhoria").value,
+
+        descricao: document.getElementById("descricao").value
+    }
+
+    const resposta = await fetch(
+        "/api/salvar",
+        {
+            method:"POST",
+
+            headers:{
+                "Content-Type":"application/json"
+            },
+
+            body: JSON.stringify(dados)
+        }
+    )
+
+    const retorno = await resposta.json()
+
+    if(retorno.status == "ok"){
+
+        alert("Registro salvo com sucesso!")
+
+        carregarRegistros()
+    }
+}
+
+
+// =========================
+// LISTAR REGISTROS
+// =========================
+async function carregarRegistros(){
+
+    const resposta = await fetch("/api/registros")
+
+    const dados = await resposta.json()
+
+    const lista = document.getElementById("lista")
+
+    lista.innerHTML = ""
+
+    dados.forEach(item => {
+
+        lista.innerHTML += `
+
+        <div class="card">
+
+            <strong>${item.modelo}</strong><br>
+
+            ${item.modulacao}<br>
+
+            ${item.setor}<br>
+
+            ${item.versao}<br>
+
+            ${item.data_registro}
+
+        </div>
+
+        `
+    })
+}
+
+
+// =========================
+// INICIAR SISTEMA
+// =========================
+carregarModelos()
+
+carregarRegistros()
