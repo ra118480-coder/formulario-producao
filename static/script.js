@@ -1,159 +1,84 @@
-const feiraSelect = document.getElementById("modelo")
-const produtoSelect = document.getElementById("modulacao")
-const modulacaoSelect = document.getElementById("variavel")
+const feira = document.getElementById("modelo")
+const produto = document.getElementById("modulacao")
+const modulacao = document.getElementById("variavel")
 
 
-// ================================
-// CARREGAR FEIRAS
-// ================================
-async function carregarFeiras() {
+// FEIRAS
+async function loadFeiras() {
 
-    const resposta = await fetch("/api/feiras")
+const res = await fetch("/api/feiras")
+const data = await res.json()
 
-    const dados = await resposta.json()
+feira.innerHTML = "<option>Selecione</option>"
 
-    feiraSelect.innerHTML =
-        '<option value="">Selecione</option>'
+data.forEach(i => {
+feira.innerHTML += `<option>${i}</option>`
+})
 
-    dados.forEach(item => {
-
-        feiraSelect.innerHTML += `
-            <option value="${item}">
-                ${item}
-            </option>
-        `
-    })
 }
 
 
-// ================================
-// CARREGAR PRODUTOS
-// ================================
-async function carregarProdutos(feira) {
+// PRODUTOS
+async function loadProdutos(f) {
 
-    const resposta =
-        await fetch(`/api/produtos/${feira}`)
+const res = await fetch(`/api/produtos/${f}`)
+const data = await res.json()
 
-    const dados = await resposta.json()
+produto.innerHTML = "<option>Selecione</option>"
+modulacao.innerHTML = "<option>Selecione</option>"
 
-    produtoSelect.innerHTML =
-        '<option value="">Selecione</option>'
+data.forEach(i => {
+produto.innerHTML += `<option>${i}</option>`
+})
 
-    modulacaoSelect.innerHTML =
-        '<option value="">Selecione</option>'
-
-    dados.forEach(item => {
-
-        produtoSelect.innerHTML += `
-            <option value="${item}">
-                ${item}
-            </option>
-        `
-    })
 }
 
 
-// ================================
-// CARREGAR MODULACOES
-// ================================
-async function carregarModulacoes(feira, produto) {
+// MODULAÇÕES
+async function loadModulacoes(f, p) {
 
-    const resposta =
-        await fetch(`/api/modulacoes/${feira}/${produto}`)
+const res = await fetch(`/api/modulacoes/${f}/${p}`)
+const data = await res.json()
 
-    const dados = await resposta.json()
+modulacao.innerHTML = "<option>Selecione</option>"
 
-    modulacaoSelect.innerHTML =
-        '<option value="">Selecione</option>'
+data.forEach(i => {
+modulacao.innerHTML += `<option>${i}</option>`
+})
 
-    dados.forEach(item => {
-
-        modulacaoSelect.innerHTML += `
-            <option value="${item}">
-                ${item}
-            </option>
-        `
-    })
 }
 
 
-// ================================
-// EVENTOS
-// ================================
-feiraSelect.addEventListener("change", () => {
+// EVENTS
+feira.addEventListener("change", () => {
+loadProdutos(feira.value)
+})
 
-    carregarProdutos(feiraSelect.value)
+produto.addEventListener("change", () => {
+loadModulacoes(feira.value, produto.value)
 })
 
 
-produtoSelect.addEventListener("change", () => {
+// SUBMIT
+document.getElementById("formulario").addEventListener("submit", async (e) => {
 
-    carregarModulacoes(
-        feiraSelect.value,
-        produtoSelect.value
-    )
+e.preventDefault()
+
+const formData = new FormData(e.target)
+
+const res = await fetch("/api/salvar", {
+method: "POST",
+body: formData
+})
+
+const r = await res.json()
+
+alert("Salvo com sucesso!")
+
+e.target.reset()
+
 })
 
 
-// ================================
-// SALVAR FORMULARIO
-// ================================
-document
-    .getElementById("formulario")
-    .addEventListener("submit", async (e) => {
-
-        e.preventDefault()
-
-        const dados = {
-
-            feira: feiraSelect.value,
-
-            produto: produtoSelect.value,
-
-            modulacao: modulacaoSelect.value,
-
-            setor: document
-                .getElementById("setor")
-                .value,
-
-            versao: document
-                .getElementById("versao")
-                .value,
-
-            melhoria: document
-                .getElementById("melhoria")
-                .value,
-
-            descricao: document
-                .getElementById("descricao")
-                .value
-        }
-
-        const resposta = await fetch("/api/salvar", {
-
-            method: "POST",
-
-            headers: {
-                "Content-Type": "application/json"
-            },
-
-            body: JSON.stringify(dados)
-        })
-
-        const resultado = await resposta.json()
-
-        if (resultado.status === "ok") {
-
-            alert("Registro salvo com sucesso!")
-
-            document
-                .getElementById("formulario")
-                .reset()
-        }
-    })
-
-
-// ================================
-// INICIAR
-// ================================
-carregarFeiras()
+// INIT
+loadFeiras()
