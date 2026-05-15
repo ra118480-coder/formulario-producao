@@ -2,71 +2,37 @@
 <html lang="pt-br">
 
 <head>
-
 <meta charset="UTF-8">
-
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>Formulário de Modulações</title>
-
+<title>Formulário</title>
 <style>
 
-body {
-    font-family: Arial;
-    background: #f4f4f4;
-    padding: 30px;
-}
+body { font-family: Arial; background:#f4f4f4; padding:30px; }
 
 .container {
     max-width: 800px;
-    margin: auto;
-    background: white;
-    padding: 20px;
-    border-radius: 10px;
-}
-
-h2 {
-    text-align: center;
-}
-
-.campo {
-    margin-bottom: 15px;
-}
-
-label {
-    font-weight: bold;
+    margin:auto;
+    background:white;
+    padding:20px;
+    border-radius:10px;
 }
 
 select, input, textarea {
-    width: 100%;
-    padding: 10px;
-    margin-top: 5px;
+    width:100%;
+    padding:10px;
+    margin-top:5px;
 }
 
-.bloco {
-    border: 1px solid #ddd;
-    padding: 10px;
-    margin-bottom: 10px;
-    border-radius: 8px;
-    background: #fafafa;
-}
+.campo { margin-bottom:15px; }
 
 button {
-    padding: 10px;
-    width: 100%;
-    background: blue;
-    color: white;
-    border: none;
-    cursor: pointer;
-}
-
-.add {
-    background: green;
-    margin-top: 5px;
+    width:100%;
+    padding:12px;
+    background:blue;
+    color:white;
+    border:none;
 }
 
 </style>
-
 </head>
 
 <body>
@@ -75,70 +41,64 @@ button {
 
 <h2>Formulário de Modulações</h2>
 
-<form id="formulario">
+<form id="formulario" enctype="multipart/form-data">
 
 <!-- FEIRA -->
 <div class="campo">
 <label>Feira</label>
-<select id="modelo"></select>
+<select id="modelo" name="feira"></select>
 </div>
 
 <!-- PRODUTO -->
 <div class="campo">
 <label>Produto</label>
-<select id="modulacao"></select>
+<select id="modulacao" name="produto"></select>
 </div>
 
 <!-- MODULAÇÃO -->
 <div class="campo">
 <label>Modulação</label>
-<select id="variavel"></select>
+<select id="variavel" name="modulacao"></select>
 </div>
 
 <!-- SETOR -->
 <div class="campo">
 <label>Setor</label>
-<select id="setor">
-
+<select name="setor">
 <option>Madeira</option>
 <option>Espuma</option>
 <option>Tecido</option>
-
 </select>
 </div>
 
 <!-- CLASSIFICAÇÃO -->
 <div class="campo">
-<label>Classificação de Alteração</label>
-<select id="classificacao">
-
+<label>Classificação</label>
+<select name="classificacao">
 <option>Produto em linha</option>
 <option>Validação</option>
-
 </select>
 </div>
 
-<!-- MELHORIA -->
+<!-- TIPO -->
 <div class="campo">
 <label>Tipo</label>
-<select id="melhoria">
-
+<select name="melhoria">
 <option>Informacional</option>
 <option>Melhoria</option>
-
 </select>
 </div>
 
-<!-- BLOCOS DINÂMICOS -->
+<!-- DESCRIÇÃO -->
 <div class="campo">
-<label>Comentários + Fotos</label>
+<label>Descrição</label>
+<textarea name="descricao"></textarea>
+</div>
 
-<div id="blocos"></div>
-
-<button type="button" class="add" onclick="addBloco()">
-Adicionar novo bloco
-</button>
-
+<!-- FOTO -->
+<div class="campo">
+<label>Imagem</label>
+<input type="file" name="imagem">
 </div>
 
 <button type="submit">Salvar</button>
@@ -146,33 +106,6 @@ Adicionar novo bloco
 </form>
 
 </div>
-
-<script>
-
-function addBloco() {
-
-const div = document.getElementById("blocos")
-
-const bloco = document.createElement("div")
-
-bloco.className = "bloco"
-
-bloco.innerHTML = `
-
-<textarea placeholder="Comentário"></textarea>
-
-<input type="file" accept="image/*">
-
-`
-
-div.appendChild(bloco)
-
-}
-
-// adicionar primeiro bloco automático
-addBloco()
-
-</script>
 
 <script src="/static/script.js"></script>
 
