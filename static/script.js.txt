@@ -1,0 +1,159 @@
+const feiraSelect = document.getElementById("modelo")
+const produtoSelect = document.getElementById("modulacao")
+const modulacaoSelect = document.getElementById("variavel")
+
+
+// ================================
+// CARREGAR FEIRAS
+// ================================
+async function carregarFeiras() {
+
+    const resposta = await fetch("/api/feiras")
+
+    const dados = await resposta.json()
+
+    feiraSelect.innerHTML =
+        '<option value="">Selecione</option>'
+
+    dados.forEach(item => {
+
+        feiraSelect.innerHTML += `
+            <option value="${item}">
+                ${item}
+            </option>
+        `
+    })
+}
+
+
+// ================================
+// CARREGAR PRODUTOS
+// ================================
+async function carregarProdutos(feira) {
+
+    const resposta =
+        await fetch(`/api/produtos/${feira}`)
+
+    const dados = await resposta.json()
+
+    produtoSelect.innerHTML =
+        '<option value="">Selecione</option>'
+
+    modulacaoSelect.innerHTML =
+        '<option value="">Selecione</option>'
+
+    dados.forEach(item => {
+
+        produtoSelect.innerHTML += `
+            <option value="${item}">
+                ${item}
+            </option>
+        `
+    })
+}
+
+
+// ================================
+// CARREGAR MODULACOES
+// ================================
+async function carregarModulacoes(feira, produto) {
+
+    const resposta =
+        await fetch(`/api/modulacoes/${feira}/${produto}`)
+
+    const dados = await resposta.json()
+
+    modulacaoSelect.innerHTML =
+        '<option value="">Selecione</option>'
+
+    dados.forEach(item => {
+
+        modulacaoSelect.innerHTML += `
+            <option value="${item}">
+                ${item}
+            </option>
+        `
+    })
+}
+
+
+// ================================
+// EVENTOS
+// ================================
+feiraSelect.addEventListener("change", () => {
+
+    carregarProdutos(feiraSelect.value)
+})
+
+
+produtoSelect.addEventListener("change", () => {
+
+    carregarModulacoes(
+        feiraSelect.value,
+        produtoSelect.value
+    )
+})
+
+
+// ================================
+// SALVAR FORMULARIO
+// ================================
+document
+    .getElementById("formulario")
+    .addEventListener("submit", async (e) => {
+
+        e.preventDefault()
+
+        const dados = {
+
+            feira: feiraSelect.value,
+
+            produto: produtoSelect.value,
+
+            modulacao: modulacaoSelect.value,
+
+            setor: document
+                .getElementById("setor")
+                .value,
+
+            versao: document
+                .getElementById("versao")
+                .value,
+
+            melhoria: document
+                .getElementById("melhoria")
+                .value,
+
+            descricao: document
+                .getElementById("descricao")
+                .value
+        }
+
+        const resposta = await fetch("/api/salvar", {
+
+            method: "POST",
+
+            headers: {
+                "Content-Type": "application/json"
+            },
+
+            body: JSON.stringify(dados)
+        })
+
+        const resultado = await resposta.json()
+
+        if (resultado.status === "ok") {
+
+            alert("Registro salvo com sucesso!")
+
+            document
+                .getElementById("formulario")
+                .reset()
+        }
+    })
+
+
+// ================================
+// INICIAR
+// ================================
+carregarFeiras()
