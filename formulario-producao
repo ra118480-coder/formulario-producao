@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Registro de Produção</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#F5F2EE;
+  --card:#FFFFFF;
+  --accent:#1A1A2E;
+  --accent2:#E8572A;
+  --border:#DDD8D0;
+  --text:#1A1A1A;
+  --muted:#7A7570;
+  --light:#F0EDE8;
+  --success:#2D7A4F;
+  --error:#C0392B;
+  --radius:12px;
+}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);min-height:100vh;padding:0}
+.page{max-width:680px;margin:0 auto;padding:2rem 1rem 4rem}
+
+/* HEADER */
+.form-header{margin-bottom:2.5rem;padding-bottom:2rem;border-bottom:2px solid var(--accent)}
+.form-header h1{font-family:'Syne',sans-serif;font-size:2rem;font-weight:700;color:var(--accent);letter-spacing:-1px;line-height:1.1}
+.form-header p{font-size:0.875rem;color:var(--muted);margin-top:0.5rem}
+.badge-count{display:inline-block;background:var(--accent2);color:#fff;font-size:0.7rem;font-weight:600;padding:2px 8px;border-radius:20px;margin-left:8px;font-family:'Syne',sans-serif;letter-spacing:0.5px;vertical-align:middle}
+
+/* PROGRESS */
+.progress-bar{display:flex;gap:6px;margin-bottom:2rem}
+.prog-step{flex:1;height:4px;background:var(--border);border-radius:2px;transition:background 0.3s}
+.prog-step.active{background:var(--accent2)}
+.prog-step.done{background:var(--accent)}
+
+/* SCREEN */
+.screen{display:none}
+.screen.active{display:block}
+
+/* SECTION LABEL */
+.section-tag{display:inline-block;font-family:'Syne',sans-serif;font-size:0.65rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--accent2);margin-bottom:1.25rem}
+
+/* FIELD */
+.field{margin-bottom:1.5rem}
+.field label{display:block;font-size:0.8rem;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:0.5rem;font-family:'Syne',sans-serif}
+.field label .req{color:var(--accent2);margin-left:2px}
+
+/* SEARCH BOX */
+.search-wrap{position:relative}
+.search-input{width:100%;padding:14px 16px 14px 44px;font-family:'DM Sans',sans-serif;font-size:15px;color:var(--text);background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);outline:none;transition:border 0.2s}
+.search-input:focus{border-color:var(--accent)}
+.search-icon{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:18px;pointer-events:none}
+.dropdown{position:absolute;top:calc(100% + 4px);left:0;right:0;background:var(--card);border:1.5px solid var(--accent);border-radius:var(--radius);max-height:260px;overflow-y:auto;z-index:100;display:none;box-shadow:0 8px 24px rgba(0,0,0,.1)}
+.dropdown.open{display:block}
+.dd-item{padding:11px 16px;font-size:14px;cursor:pointer;border-bottom:1px solid var(--light);transition:background 0.15s;display:flex;justify-content:space-between;align-items:center}
+.dd-item:last-child{border-bottom:none}
+.dd-item:hover,.dd-item.selected{background:var(--light)}
+.dd-item .dd-sub{font-size:11px;color:var(--muted);font-family:'Syne',sans-serif}
+.dd-empty{padding:14px 16px;font-size:13px;color:var(--muted);text-align:center}
+.selected-display{margin-top:8px;display:none}
+.selected-chip{display:inline-flex;align-items:center;gap:8px;background:var(--accent);color:#fff;padding:8px 14px;border-radius:8px;font-size:13px;font-weight:500}
+.selected-chip .clear{cursor:pointer;opacity:0.7;font-size:16px;line-height:1;transition:opacity 0.15s}
+.selected-chip .clear:hover{opacity:1}
+.cod-badge{font-family:'Syne',sans-serif;font-size:10px;opacity:0.6;margin-left:4px}
+
+/* CHIP SELECTOR */
+.chip-group{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px}
+.chip{padding:9px 18px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;color:var(--muted);cursor:pointer;transition:all 0.15s;user-select:none;font-weight:500}
+.chip:hover{border-color:var(--accent);color:var(--accent)}
+.chip.selected{background:var(--accent);border-color:var(--accent);color:#fff}
+
+/* TEXT INPUT */
+select,input[type=text],input[type=number],input[type=date],textarea{
+  width:100%;padding:14px 16px;font-family:'DM Sans',sans-serif;font-size:15px;
+  color:var(--text);background:var(--card);border:1.5px solid var(--border);
+  border-radius:var(--radius);outline:none;transition:border 0.2s;
+  -webkit-appearance:none;appearance:none
+}
+select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%237A7570' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;padding-right:40px}
+select:focus,input:focus,textarea:focus{border-color:var(--accent)}
+textarea{resize:vertical;min-height:100px;line-height:1.6}
+select:disabled{background-color:var(--light);color:var(--muted);cursor:not-allowed}
+
+/* GRID */
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+
+/* BUTTONS */
+.btn-row{display:flex;gap:10px;justify-content:flex-end;margin-top:2rem}
+.btn{padding:13px 28px;border-radius:var(--radius);font-family:'Syne',sans-serif;font-size:0.85rem;font-weight:600;letter-spacing:0.5px;cursor:pointer;border:none;transition:all 0.2s;text-transform:uppercase}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:hover{background:#2d2d4a}
+.btn-outline{background:transparent;border:1.5px solid var(--border);color:var(--text)}
+.btn-outline:hover{border-color:var(--accent);background:var(--light)}
+.btn-submit{background:var(--accent2);color:#fff}
+.btn-submit:hover{background:#c94a20}
+
+/* DIVIDER */
+.divider{border:none;border-top:1px solid var(--border);margin:1.75rem 0}
+
+/* INFO HINT */
+.hint{display:none;background:var(--light);border-left:3px solid var(--accent2);padding:10px 14px;border-radius:0 8px 8px 0;font-size:12px;color:var(--muted);margin-top:8px}
+.hint.show{display:block}
+
+/* SUMMARY */
+.summary-card{background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);overflow:hidden;margin:1rem 0}
+.summary-row{display:grid;grid-template-columns:160px 1fr;border-bottom:1px solid var(--light)}
+.summary-row:last-child{border-bottom:none}
+.summary-row .sk{padding:12px 16px;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;color:var(--muted);background:var(--light);font-family:'Syne',sans-serif}
+.summary-row .sv{padding:12px 16px;font-size:14px;color:var(--text);font-weight:500}
+
+/* SUCCESS */
+.success-wrap{text-align:center;padding:3rem 1rem}
+.success-icon{width:72px;height:72px;background:var(--accent);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 1.5rem;color:#fff;font-size:32px}
+.success-wrap h2{font-family:'Syne',sans-serif;font-size:1.5rem;font-weight:700;color:var(--accent);margin-bottom:0.5rem}
+.success-wrap p{color:var(--muted);font-size:14px;line-height:1.6}
+.btn-group-center{display:flex;gap:10px;justify-content:center;margin-top:1.5rem;flex-wrap:wrap}
+
+/* NOTIFY */
+.notify{position:fixed;top:1.5rem;right:1.5rem;padding:14px 20px;border-radius:10px;font-size:13px;font-weight:500;z-index:9999;display:none;max-width:320px;font-family:'DM Sans',sans-serif;box-shadow:0 4px 20px rgba(0,0,0,.15)}
+.notify.success{background:var(--success);color:#fff}
+.notify.error{background:var(--error);color:#fff}
+
+/* RECORDS */
+.rec-item{background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);padding:14px 16px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.rec-main{font-size:14px;font-weight:500;color:var(--text)}
+.rec-sub{font-size:12px;color:var(--muted);margin-top:3px}
+.rec-time{font-size:11px;color:var(--muted);white-space:nowrap;font-family:'Syne',sans-serif;text-align:right}
+
+/* TABS */
+.tabs{display:flex;border-bottom:2px solid var(--border);margin-bottom:2rem}
+.tab{padding:10px 16px;font-family:'Syne',sans-serif;font-size:0.75rem;font-weight:600;letter-spacing:1px;text-transform:uppercase;cursor:pointer;border:none;background:transparent;color:var(--muted);border-bottom:2px solid transparent;margin-bottom:-2px;transition:all 0.2s}
+.tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+
+@media(max-width:500px){
+  .grid-2{grid-template-columns:1fr}
+  .summary-row{grid-template-columns:1fr}
+  .summary-row .sk{border-bottom:none;padding-bottom:4px}
+}
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="form-header">
+    <h1>Registro de Produção<span class="badge-count">527 modelos</span></h1>
+    <p>Preencha os dados da peça produzida — as opções são carregadas automaticamente do banco de dados</p>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('form',this)">Formulário</button>
+    <button class="tab" onclick="switchTab('records',this)">Registros (<span id="rec-count">0</span>)</button>
+  </div>
+
+  <!-- ===== FORM TAB ===== -->
+  <div id="tab-form">
+    <div class="progress-bar">
+      <div class="prog-step active" id="p1"></div>
+      <div class="prog-step" id="p2"></div>
+      <div class="prog-step" id="p3"></div>
+    </div>
+
+    <!-- SCREEN 1: Produto + Modulação -->
+    <div class="screen active" id="sc1">
+      <div class="section-tag">Etapa 1 — Identificação do produto</div>
+
+      <div class="field">
+        <label>Modelo <span class="req">*</span></label>
+        <div class="search-wrap">
+          <span class="search-icon">⌕</span>
+          <input class="search-input" id="inp-produto" type="text" placeholder="Digite o nome ou código do modelo..." autocomplete="off" oninput="filterProdutos(this.value)" onfocus="openDropdown('dd-produto')" />
+          <div class="dropdown" id="dd-produto"></div>
+        </div>
+        <div class="selected-display" id="sel-produto-display">
+          <div class="selected-chip">
+            <span id="sel-produto-text"></span>
+            <span class="clear" onclick="clearProduto()">✕</span>
+          </div>
+        </div>
+        <div class="hint" id="hint-produto"></div>
+      </div>
+
+      <div class="field">
+        <label>Modulação <span class="req">*</span></label>
+        <div class="search-wrap">
+          <span class="search-icon">⌕</span>
+          <input class="search-input" id="inp-modulacao" type="text" placeholder="Selecione o modelo primeiro..." autocomplete="off" oninput="filterModulacoes(this.value)" onfocus="openDropdown('dd-modulacao')" disabled />
+          <div class="dropdown" id="dd-modulacao"></div>
+        </div>
+        <div class="selected-display" id="sel-modulacao-display">
+          <div class="selected-chip">
+            <span id="sel-modulacao-text"></span>
+            <span class="clear" onclick="clearModulacao()">✕</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="goTo2()">Próximo →</button>
+      </div>
+    </div>
+
+    <!-- SCREEN 2: Detalhes -->
+    <div class="screen" id="sc2">
+      <div class="section-tag">Etapa 2 — Detalhes da produção</div>
+
+      <div class="field">
+        <label>Setor <span class="req">*</span></label>
+        <div class="chip-group" id="chip-setor">
+          <div class="chip" data-val="Montagem" onclick="selectChip(this,'chip-setor')">Montagem</div>
+          <div class="chip" data-val="Tecido" onclick="selectChip(this,'chip-setor')">Tecido</div>
+          <div class="chip" data-val="Espuma" onclick="selectChip(this,'chip-setor')">Espuma</div>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="field">
+          <label>Versão <span class="req">*</span></label>
+          <select id="sel-versao">
+            <option value="">Selecione...</option>
+            <option>v1</option><option>v2</option><option>v3</option>
+            <option>v4</option><option>v5</option><option>v6</option>
+            <option>v7</option><option>v8</option><option>v9</option><option>v10</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Tipo de Melhoria</label>
+          <select id="sel-melhoria">
+            <option value="">Nenhuma</option>
+            <option>Estética</option>
+            <option>Estrutural</option>
+            <option>Funcional</option>
+            <option>Processo</option>
+            <option>Qualidade</option>
+            <option>Custo</option>
+            <option>Outra</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="field">
+          <label>Data <span class="req">*</span></label>
+          <input type="date" id="inp-data">
+        </div>
+        <div class="field">
+          <label>Hora de conclusão <span class="req">*</span></label>
+          <input type="text" id="inp-hora-fim" placeholder="Ex: 14:30" maxlength="5" oninput="maskHora(this)">
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Descrição do que foi feito <span class="req">*</span></label>
+        <textarea id="inp-descricao" placeholder="Descreva detalhadamente o que foi produzido ou alterado nesta peça..."></textarea>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-outline" onclick="goTo1()">← Voltar</button>
+        <button class="btn btn-primary" onclick="goTo3()">Revisar →</button>
+      </div>
+    </div>
+
+    <!-- SCREEN 3: Revisão -->
+    <div class="screen" id="sc3">
+      <div class="section-tag">Etapa 3 — Revisão e envio</div>
+      <div class="summary-card" id="summary-card"></div>
+      <div class="btn-row">
+        <button class="btn btn-outline" onclick="goTo2()">← Editar</button>
+        <button class="btn btn-submit" onclick="submitForm()">✓ Salvar Registro</button>
+      </div>
+    </div>
+
+    <!-- SCREEN SUCCESS -->
+    <div class="screen" id="scOK">
+      <div class="success-wrap">
+        <div class="success-icon">✓</div>
+        <h2>Registro salvo!</h2>
+        <p>O registro foi salvo com sucesso.<br>Você pode exportar todos os registros como CSV a qualquer momento.</p>
+        <div class="btn-group-center">
+          <button class="btn btn-outline" onclick="newForm()">+ Novo registro</button>
+          <button class="btn btn-submit" onclick="exportCSV()">↓ Exportar CSV</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== RECORDS TAB ===== -->
+  <div id="tab-records" style="display:none">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
+      <p style="font-size:13px;color:var(--muted)" id="rec-subtitle">Nenhum registro ainda.</p>
+      <button class="btn btn-outline" onclick="exportCSV()" style="padding:9px 16px;font-size:0.75rem">↓ Exportar CSV</button>
+    </div>
+    <div id="records-list"></div>
+  </div>
+</div>
+
+<div class="notify" id="notify"></div>
+
+<script>
+const DB = {"MODELO ADANA":{"cod":"20001","modulacoes":["1B + PUFF BI","1B 1AS","1B 2AS","1B S/ENC + SB 1AS","2B 2AS","CTO","CTO + PUFF BI","POL","PUFF","PUFF CTO","SB 1AS","SB 1AS + PUFF BI","SB 2AS"],"colecoes":["PREVIEW - 2018"]},"MODELO ALLADRO":{"cod":"20005","modulacoes":["1B 1AS","1B 2AS","2B 2AS","CH 1B","CTO","PUFF","PUFF CTO","SB 1AS","SB 2AS","SB BI","SB CURVO"],"colecoes":["ABIMAD - 2019"]},"MODELO ANCONA":{"cod":"20008","modulacoes":["1B 1AS","2B 1AS"],"colecoes":["ABIMAD - 2017"]},"MODELO ANDROS":{"cod":"20009","modulacoes":["1B BI","1B BI AP","2B 1AS","SB 2BI"],"colecoes":["PREVIEW - 2017"]},"MODELO NEW ARROYOS":{"cod":"20015","modulacoes":["1B 1AS","1B 2AS","2B 2AS","CEV","CH 1B","CTO","PUFF","PUFF CTO","SB 1AS","SB BI"],"colecoes":["ABIMAD - 2019"]},"MODELO NEW ARTTIS":{"cod":"20016","modulacoes":["1B 1AS","1B S/ENC","2B 1AS","PUFF","PUFF BI","PUFF CTO","PUFF MEIO","SB 1AS"],"colecoes":["PREVIEW - 2017"]},"MODELO NEW BEDFORD":{"cod":"20027","modulacoes":["1B + 1B","1B + PUFF BI","1B 1AS","1B 2AS","2B 2AS","CH 1B","CTO","CTO + PUFF BI","POL","PUFF","PUFF CTO","SB 1AS","SB 1AS + PUFF BI"],"colecoes":["PREVIEW - 2019"]},"MODELO BILBAU":{"cod":"20031","modulacoes":["ALMOFADA DECORATIVA","ASS","ASS CTO","ENC 1B","ENC CURVO","ENC SB"],"colecoes":["PREVIEW - 2018"]},"MODELO ORLY":{"cod":"20090","modulacoes":["1B 1AS","POL","PUFF","SB 1AS"],"colecoes":["ABIMAD - 2017"]},"MODELO TARANTO":{"cod":"20110","modulacoes":["1B 1AS","1B 2AS","2B 2AS","CH 1B","CTO","PUFF CTO","SB 1AS"],"colecoes":["ABIMAD - 2017"]},"MODELO VERATO":{"cod":"20118","modulacoes":["1B 1AS","CEV","CH 1B","CH SB","CTO","PUFF","PUFF CTO","SB 1AS","SB BI","TEC ALMO DEC FOLE"],"colecoes":["ABIMAD - 2017"]},"MODELO NEW VERSATO":{"cod":"20121","modulacoes":["1B 1AS","CH 1B","CH SB","CTO","PUFF","PUFF CTO","SB 1AS","TEC ALMO DECORATIVA"],"colecoes":["ABIMAD - 2017"]},"MODELO VILLACH":{"cod":"20123","modulacoes":["1B 1AS","2B 1AS"],"colecoes":["PREVIEW - 2017"]},"MODELO NEW YANG":{"cod":"20126","modulacoes":["1B 1AS","1B 2AS","2B 2AS","CH 1B","CTO","POL","PUFF","SB 1AS"],"colecoes":["ABIMAD - 2017"]},"MODELO PIZZARELLI":{"cod":"20129","modulacoes":["1B + 1B","1B 1AS","2B 1AS","CH 1B","CTO","POL","PUFF","PUFF CTO","SB 1AS"],"colecoes":[]},"MODELO JOPLIN":{"cod":"20130","modulacoes":["1B 1AS","2B 2AS","CH 1B","CTO","POL","PUFF","PUFF CTO","SB 1AS"],"colecoes":["PREVIEW - 2018"]},"MODELO RIO DE JANEIRO":{"cod":"20135","modulacoes":["2B 1AS","POL","PUFF"],"colecoes":["PREVIEW - 2019"]},"MODELO SAN ANDRES":{"cod":"20136","modulacoes":["1B 1AS","1B 2AS","2B 2AS","CH 1B","CH 2B","CTO","POL","PUFF","PUFF CTO","SB 1AS","SB BI"],"colecoes":["PREVIEW - 2019"]},"MODELO NEW CHATEAU":{"cod":"20151","modulacoes":["1B + 1B","1B 1AS","1B 2AS","2B 2AS","CEV","CH 1B","CTO","CTO + PUFF BI","PUFF","PUFF CTO","SB 1AS","SB 1AS + PUFF BI","SB 2AS"],"colecoes":["ABIMAD - 2017"]},"MODELO MONTERREY":{"cod":"20158","modulacoes":["ALMOFADA DECORATIVA","ASS","ASS CTO","ENC 1B","ENC CURVO","ENC SB"],"colecoes":["ABIMAD - 2019"]},"MODELO DION":{"cod":"20159","modulacoes":["1B 1AS","2B 1AS","CEV","CH 1B","CTO","PUFF","PUFF CTO","SB BI"],"colecoes":[]},"MODELO FONSI":{"cod":"20161","modulacoes":["1B 1AS","1B 2AS","2B 2AS","CH 1B","CTO","PUFF","PUFF CTO","SB BI"],"colecoes":[]},"MODELO JACKSON":{"cod":"20164","modulacoes":["1B 1AS","1B 2AS","2B 2AS","CH 1B","CTO","PUFF","PUFF CTO","SB BI"],"colecoes":[]},"MODELO JOHNNY":{"cod":"20166","modulacoes":["1B 1AS","1B 2AS","2B 2AS","CH 1B","CTO","POL","PUFF","PUFF CTO"],"colecoes":["PREVIEW - 2018"]},"MODELO KEITH":{"cod":"20167","modulacoes":["1B 1AS","2B 1AS","CH 1B","CTO","PRIVATE LABEL","PUFF","PUFF CTO"],"colecoes":["ABIMAD - 2019"]},"MODELO MICK":{"cod":"20171","modulacoes":["1B 2AS","2B 2AS","CH 1B","CTO","PUFF","SB 2AS"],"colecoes":["ABIMAD - 2019"]},"MODELO OSBOURNE":{"cod":"20172","modulacoes":["1B 1AS","1B 2AS","2B 2AS","CH 1B","CTO","PUFF","PUFF CTO"],"colecoes":[]},"MODELO PAGE":{"cod":"20173","modulacoes":["1B 1AS","1B 2AS","2B 2AS","CH 1B","CTO","PUFF"],"colecoes":[]},"MODELO PRESLEY":{"cod":"20174","modulacoes":["1B 1AS","1B 2AS","2B 2AS","CH 1B","CTO","PUFF","PUFF CTO"],"colecoes":["PREVIEW - 2018"]},"MODELO MULLIGAN":{"cod":"20180","modulacoes":["1B + 1B","1B 1AS","2B 1AS","CH 1B","CTO","POL","PUFF","PUFF CTO","SB 1AS"],"colecoes":[]},"MODELO CAPA MCCARTNEY":{"cod":"20182","modulacoes":["2B 2AS","POL","PUFF"],"colecoes":[]},"MODELO BLUES":{"cod":"20184","modulacoes":["1B 1AS","ALMOFADA DECORATIVA","POL","PUFF","SB 1AS"],"colecoes":[]},"MODELO BUARQUE":{"cod":"20185","modulacoes":["1B 2AS","2B 2AS","2B 3AS","2B 4AS","CH 1B","CTO","POL","PUFF","SB 2AS"],"colecoes":[]},"MODELO CASCAIS":{"cod":"20186","modulacoes":["1B 1AS","1B 2AS","2B 2AS","CH 1B","CTO","CTO CH","PUFF","PUFF CTO","SB 1AS","SB BI"],"colecoes":[]},"MODELO COMPOR":{"cod":"20188","modulacoes":["1B 1AS","2B 2AS","CH 1B","CTO","PUFF","SB 1AS"],"colecoes":[]},"MODELO FUNCHAL":{"cod":"20190","modulacoes":["1B 1AS","2B 1AS"],"colecoes":["BRETON - 2019"]},"MODELO ORNELLO":{"cod":"20191","modulacoes":["1B 1AS","2B 2AS","ALMOFADA DECORATIVA","CH 1B","CTO","PUFF","SB 1AS"],"colecoes":[]},"MODELO PERRIAND":{"cod":"20192","modulacoes":["1B 1AS","2B 2AS","CTO","SB 1AS"],"colecoes":[]},"MODELO NEW YANNIS":{"cod":"20193","modulacoes":["1B 1AS","2B 2AS","CH 1B","CTO","PUFF","SB 1AS"],"colecoes":[]},"MODELO ESPLENDOR":{"cod":"20194","modulacoes":["1B 1AS","CH 1B","CH SB","PUFF","SB 1AS"],"colecoes":[]},"MODELO FLUFF":{"cod":"20197","modulacoes":["1B 1AS","1B 2AS","2B 2AS","CH 1B","CH SB","CTO","PUFF","SB 1AS"],"colecoes":[]},"MODELO YVES":{"cod":"20201","modulacoes":["1B 1AS","1B 2AS","2B 2AS","APARADOR","CH 1B","PUFF","SB 1AS","SB 2AS"],"colecoes":[]},"MODELO JAZZ":{"cod":"20202","modulacoes":["1B 1AS","2B 2AS","POL","PUFF"],"colecoes":[]},"MODELO ANAHI":{"cod":"20204","modulacoes":["1B 1AS","1B 1AS/1B 1AS","1B 1AS/CH 1B","1B 2AS","APARADOR","PUFF","SB 1AS","SB 1AS/SB 1AS","SB 2AS","SB BI/SB BI"],"colecoes":[]},"MODELO BONOBO":{"cod":"20205","modulacoes":["1B 1AS","2B 2AS"],"colecoes":["ABIMAD - 2020"]},"MODELO CADU":{"cod":"20206","modulacoes":["1B 1AS","2B 2AS","PUFF"],"colecoes":[]},"MODELO CARAVAN":{"cod":"20207","modulacoes":["1B 1AS","CH 1B","CTO","PUFF","SB 1AS"],"colecoes":[]},"MODELO LAURENT":{"cod":"20208","modulacoes":["1B 1AS","1B 2AS","2B 2AS","2B 3AS","CTO","POL","PUFF","PUFF CTO","SB 1AS"],"colecoes":["ABIMAD - 2020"]},"MODELO LINARES":{"cod":"20209","modulacoes":["1B 1AS","1B 2AS","2B 2AS","CH 1B","CTO","PUFF","PUFF CTO","SB 1AS","SB 2AS","SB BI"],"colecoes":["ABIMAD - 2020"]},"MODELO CAPA MONET":{"cod":"20215","modulacoes":["1B 1AS","2B 2AS","PUFF"],"colecoes":[]},"MODELO BARON":{"cod":"20221","modulacoes":["2B 1AS"],"colecoes":[]},"MODELO CHIADO":{"cod":"20230","modulacoes":["1B + 1B","1B 1AS","1B 2AS","2B 2AS","CEV","CH 1B","CH AV","CTO","PUFF","PUFF CTO","SB 1AS","SB 2AS"],"colecoes":["BRETON - 2020"]},"MODELO PREMIER":{"cod":"20320","modulacoes":["1B 1AS"],"colecoes":[]},"MODELO BENVENUTO":{"cod":"20344","modulacoes":["1B 1AS","1B 2AS","1B 3AS","2B 2AS","2B 3AS","CH 1B","CTO"],"colecoes":["SACCARO - 2021"]},"MODELO CAPA FIER":{"cod":"20359","modulacoes":["1B + 1B","1B 1AS","1B 1AS + SB 1AS","CEV","CH 1B","CH SB","CTO","CTO CH","POL","PUFF","PUFF CTO","SB 1AS"],"colecoes":["ABIMAD - 2022"]},"MODELO KLOS":{"cod":"20360","modulacoes":["2B 2AS"],"colecoes":[]},"MODELO AGOGO SARTI":{"cod":"20383","modulacoes":["2B 1AS"],"colecoes":[]},"MODELO LINARES TESTES":{"cod":"20394","modulacoes":["2B 2AS","SB 1AS"],"colecoes":["ABIMAD - 2020"]},"MODELO PORTIMAO":{"cod":"20400","modulacoes":["1B 1AS","1B 2AS","2B 2AS","CEV","CH 1B","CH 2B","CH SB","CTO","CTO CH","POL","PUFF","PUFF CTO","SB 1AS"],"colecoes":[]},"MODELO CAPA BELEM":{"cod":"20403","modulacoes":["1B + 1B","1B 1AS","1B 1AS + SB 1AS","2B 1AS","CEV","CH 1B","CH 2B","CH SB","CTO","CTO CH","POL","PUFF","PUFF CTO","SB 1AS"],"colecoes":["BRETON - 2022"]},"MODELO FIER":{"cod":"20410","modulacoes":["1B + 1B","1B 1AS","1B 1AS + SB 1AS","CEV","CH 1B","CH SB","CTO","CTO CH","POL","PUFF","PUFF CTO","SB 1AS"],"colecoes":["ABIMAD - 2022"]},"MODELO NEW TERNI ESP/":{"cod":"20413","modulacoes":["1B 1AS"],"colecoes":["BRETON - 2018"]},"MODELO ARAD":{"cod":"20442","modulacoes":["1B + 1B","1B BI CURVO","2B 1AS","2B CURVO","PUFF"],"colecoes":["ABIMAD - 2022"]},"MODELO OTOPENI":{"cod":"20446","modulacoes":["1B 1AS","2B 1AS","CH 1B","CTO","CTO 45","PUFF"],"colecoes":["ABIMAD - 2022"]},"MODELO CORSO":{"cod":"20448","modulacoes":["1B 1AS","1B 1AS/1B 1AS","2B 1AS","CH 1B","CH 1B/1B 1AS","CTO","CTO/CTO","SB 1AS","SB 1AS/SB 1AS","SB BI","SB BI/SB BI"],"colecoes":["PREVIEW - 2023"]},"MODELO ETERIUM":{"cod":"20449","modulacoes":["1B 1AS","2B 1AS","CH 1B","CTO","PUFF","PUFF 45","PUFF BI","PUFF MEIO","SB 1AS"],"colecoes":["PREVIEW - 2023"]},"MODELO BANAT":{"cod":"20452","modulacoes":["1B 1AS","1B 2AS","2B 1AS","2B 2AS","CEV","CH 1B","CH 1B REDONDA","CH SB","CTO","PUFF","PUFF BI","PUFF CTO","PUFF MEIO","SB 1AS","SB 2AS","SB BI"],"colecoes":["ABIMAD - 2022"]},"MODELO CAPA CEZANNE":{"cod":"20454","modulacoes":["SB 1AS"],"colecoes":[]},"MODELO TAUNAY":{"cod":"20467","modulacoes":["1B 1AS","2B 1AS","CH 1B","CTO","PUFF","SB 1AS"],"colecoes":[]},"MODELO CAPA TAUNAY":{"cod":"20468","modulacoes":["1B 1AS","2B 1AS","CH 1B","CTO","PUFF","SB 1AS"],"colecoes":[]},"MODELO LABISSE":{"cod":"20469","modulacoes":["2B 1AS"],"colecoes":[]},"MODELO LAGOS":{"cod":"20472","modulacoes":["1B 1AS","2B 2AS","CH 1B","CTO","POL","PUFF","PUFF CTO","SB 1AS"],"colecoes":[]},"MODELO LOURES":{"cod":"20482","modulacoes":["1B 1AS","1B 2AS","2B 2AS","CEV","CH 1B","CTO","PUFF","PUFF BI","PUFF CTO","PUFF MEIO","SB 1AS","SB 2AS","SB BI","SB BI REDONDO","SB CURVO"],"colecoes":[]},"MODELO ALENTO":{"cod":"20486","modulacoes":["1B + PUFF BI","1B 1AS","1B 1AS/1B 1AS","1B 1AS/CH 1B","1B 2AS","2B 2AS","CH 1B","CTO","CTO 45","CTO CH 45","PUFF","PUFF/PUFF","SB 1AS","SB 1AS + PUFF BI","SB 1AS/SB 1AS","SB 2AS","SB 2AS/SB 2AS"],"colecoes":["ABIMAD - 2023"]},"MODELO POMME":{"cod":"20487","modulacoes":["1B 1AS","2B 1AS","CTO","CTO CH 45","POL","PUFF","SB 1AS","SB BI"],"colecoes":["ABIMAD - 2023"]},"MODELO CAPA FLORENCE":{"cod":"20490","modulacoes":["1B + 1B","2B 2AS","PUFF"],"colecoes":["ABIMAD - 2023"]},"MODELO DESIR":{"cod":"20493","modulacoes":["1B 1AS","1B BI","2B 1AS","CTO","CTO 30","CTO 45","SB 1AS","SB BI"],"colecoes":["PREVIEW - 2024"]},"MODELO LITERATTO":{"cod":"20502","modulacoes":["ASS","ASS ARRED","ASS CTO 45","ASS LUA","ENC 1B","ENC 45","ENC SB","PUFF RED","ROLINHO"],"colecoes":["ABIMAD - 2023"]},"MODELO DESMOND":{"cod":"20506","modulacoes":["1B + PUFF BI","1B 1AS","1B 2AS","2B 2AS","APARADOR","CTO","MESA","PUFF","PUFF BI","PUFF MEIO","SB 1AS","SB 1AS + PUFF BI","SB BI"],"colecoes":["ABIMAD - 2023"]},"MODELO DIDOT":{"cod":"20507","modulacoes":["1B 1AS","CEV","CH 1B","CH SB","CTO","PUFF BI","PUFF CTO","PUFF MEIO","SB 1AS","SB BI"],"colecoes":["ABIMAD - 2023"]},"MODELO ARLO":{"cod":"20524","modulacoes":["1B 1AS","2B 1AS","BANCO","CEV","CTO","POL","PUFF","PUFF BI","PUFF MEIO","SB 1AS"],"colecoes":["PONTOVIRGULA - 2023"]},"MODELO NEW SAN LUIS":{"cod":"20525","modulacoes":["1B 1AS","1B 2AS","2B 2AS","2B 3AS","CH 1B","CTO","CTO CH","PUFF","PUFF CTO","SB 1AS","SB BI"],"colecoes":["PREVIEW - 2023"]},"MODELO NEW FARO":{"cod":"20528","modulacoes":["1B 1AS","1B BI CURVO","1B CURVO","2B 2AS","CH 1B","CTO","PUFF","PUFF CTO","SB 1AS","SB BI"],"colecoes":["BRETON - 2020"]},"MODELO NEW ARAGON":{"cod":"20530","modulacoes":["1B 1AS","APOIO DE CABECA","CEV","CH 1B","CTO","PUFF","PUFF CTO","PUFF CTO 60","PUFF MEIO","SB 1AS","SB BI","SB CURVO"],"colecoes":["HOME EXPERIENCE - 2020"]},"MODELO MODISTE":{"cod":"20532","modulacoes":["1B 1AS","CEV","CH 1B","CH SB","CTO","PUFF BI","PUFF CTO","PUFF MEIO","SB 1AS","SB BI"],"colecoes":["PREVIEW - 2023"]},"MODELO UCCELLI":{"cod":"20533","modulacoes":["1B 1AS","1B CURVO","2B 1AS","CTO","SB 1AS","SB BI","SB BI CURVO","SB CURVO"],"colecoes":["PREVIEW - 2023"]},"MODELO ELLIOT":{"cod":"20538","modulacoes":["1B 1AS","1B BI","1B BI CURVO","2B 1AS","CH 1B","CTO","PUFF CTO","SB 1AS","SB BI"],"colecoes":["PREVIEW - 2023"]},"MODELO SONETTO":{"cod":"20560","modulacoes":["1B 1AS","CEV","CH 1B","CH SB","CTO","PUFF BI","PUFF CTO","PUFF MEIO","SB 1AS","SB BI"],"colecoes":["ABIMAD - 2024"]},"MODELO GALILEO":{"cod":"20563","modulacoes":["1B 1AS","1B 1AS/1B 1AS","1B CURVO","CH 1B","CH 1B/1B 1AS","CH SB","CTO CH","PUFF BI","PUFF CTO","PUFF MEIO","SB 1AS","SB 1AS/SB 1AS","SB BI CURVO","SB CURVO"],"colecoes":[]},"MODELO STROZZI":{"cod":"20564","modulacoes":["CODIGO INATIVO"],"colecoes":[]},"MODELO BOTTICELLI":{"cod":"20566","modulacoes":["1B 1AS","2B 2AS","CEV","CH 1B","CTO CH","PUFF","PUFF BI","PUFF MEIO","SB 1AS","SB BI","SB BI CURVO","SB CURVO"],"colecoes":["BRETON - 2024"]},"MODELO TURA":{"cod":"20568","modulacoes":["1B 1AS","1B 1AS + PUFF MEIO","2B 2AS","CH 1B","CH 1B ANG","CTO CH","CTO CH 30","CTO CH 45","PUFF","PUFF BI","PUFF CTO","PUFF MEIO","SB 1AS","SB 1AS + PUFF MEIO","SB BI"],"colecoes":["ABIMAD - 2024"]},"MODELO AMBER":{"cod":"20574","modulacoes":["1B 1AS","1B 1AS ANG","2B 1AS","2B CURVO","CEV","CH 1B","CH SB","CTO","PUFF","PUFF BI","PUFF CTO","PUFF MEIO","SB 1AS","SB BI"],"colecoes":["ABIMAD - 2024"]},"MODELO BANAT 24":{"cod":"20578","modulacoes":["1B 1AS","1B 2AS","2B 1AS","2B 2AS","CEV","CH 1B","CH 1B REDONDA","CH SB","CTO","PUFF","PUFF BI","PUFF CTO","PUFF MEIO","SB 1AS","SB 2AS","SB BI"],"colecoes":[]},"MODELO BOLD":{"cod":"20584","modulacoes":["1B 1AS","1B 2AS","2B 2AS","CEV","CH 1B","CTO","CTO CH","PUFF","SB 1AS","SB 2AS"],"colecoes":["ABIMAD - 2025"]},"MODELO SAN MIGUEL":{"cod":"20586","modulacoes":["1B 1AS","1B 2AS","2B 2AS","CH 1B","CTO","CTO CH","PUFF","PUFF BI","PUFF CTO","PUFF MEIO","SB 1AS","SB 2AS","SB BI"],"colecoes":["PREVIEW - 2024"]},"MODELO ACORES":{"cod":"20590","modulacoes":["1B 1AS","2B 1AS","2B 2AS","CEV","CH 1B","CTO","PUFF","PUFF CTO","SB 1AS"],"colecoes":[]},"MODELO ASTRO":{"cod":"20591","modulacoes":["1B 1AS","2B 1AS","2B 2AS","2B CURVO","SB CURVO"],"colecoes":["PREVIEW - 2024"]},"MODELO LANDSCAPE":{"cod":"20592","modulacoes":["PUFF BI","SB 1AS 45","SB BI CURVO","SB CURVO"],"colecoes":[]},"MODELO COMPORTA":{"cod":"20596","modulacoes":["1B 1AS","2B 2AS","CH 1B","CH SB","CTO","PUFF","PUFF CTO","SB 1AS","SB BI"],"colecoes":[]},"MODELO REFUGE":{"cod":"20598","modulacoes":["1B 1AS","1B 1AS + PUFF MEIO","1B 1AS + SB 1AS","2B 2AS","CEV","CH 1B","CH SB","PUFF","SB 1AS","SB 1AS + PUFF BI","SB 1AS + PUFF MEIO","SB BI","SB CURVO"],"colecoes":["PREVIEW - 2024"]},"MODELO AGREABLE":{"cod":"20601","modulacoes":["1B 1AS","CH 1B","CTO CH","PUFF","PUFF BI","PUFF MEIO","SB 1AS"],"colecoes":["PREVIEW - 2024"]},"MODELO FLAMME":{"cod":"20603","modulacoes":["1B 1AS","1B CURVO","2B 1AS","2B CURVO","CTO","CTO 45","PUFF","PUFF BI","PUFF MEIO","SB 1AS","SB CURVO"],"colecoes":["PREVIEW - 2024"]},"MODELO SERENITE":{"cod":"20604","modulacoes":["1B 1AS","1B 2AS","2B 2AS","CEV","CH 1B","CTO","PUFF BI","PUFF MEIO","SB 1AS","SB BI"],"colecoes":["PREVIEW - 2024"]},"MODELO SOFA CUMBUCO":{"cod":"20608","modulacoes":["CH 1B"],"colecoes":[]},"MODELO LISBOA 24":{"cod":"20609","modulacoes":["1B 1AS","1B 2AS","2B 2AS","APARADOR","CEV","CH 1B","CH SB","CTO","PUFF","PUFF BI","PUFF CTO","PUFF CURVO","PUFF MEIO","SB 1AS","SB 2AS","SB BI","SB CURVO"],"colecoes":["BRETON - 2024"]},"MODELO GRID":{"cod":"20622","modulacoes":["1B 1AS","1B 2AS","2B 1AS","2B 2AS","CH 1B","CTO","CTO ALONGADO","PUFF","SB 1AS","SB 2AS"],"colecoes":["ABIMAD - 2025"]},"MODELO JULIAN":{"cod":"20623","modulacoes":["ASS","ASS CTO","ENC 1B","ENC CURVO","ENC SB"],"colecoes":["ABIMAD - 2025"]},"MODELO LEE":{"cod":"20624","modulacoes":["1B 1AS","2B 1AS","CTO","PUFF","PUFF MEIO","SB BI"],"colecoes":["ABIMAD - 2025"]},"MODELO ISLA":{"cod":"20627","modulacoes":["1B 1AS","2B 1AS","PUFF","PUFF BI","PUFF CTO","PUFF ILHA","SB 1AS"],"colecoes":["ABIMAD - 2025"]},"MODELO PITESTI 25":{"cod":"20628","modulacoes":["1B + 1B","1B + SB + 1B","1B 1AS","1B 1AS + SB 1AS","2B 1AS","CH 1B","CH 2B","CH SB","CTO","CTO ALONGADO","CTO CH","POL","PUFF","PUFF BI","PUFF CTO","PUFF MEIO","SB 1AS"],"colecoes":["ABIMAD - 2025"]},"MODELO NARCISO":{"cod":"20633","modulacoes":["1B 1AS","CH 1B","CH SB","CTO","CTO ALONGADO","PUFF","PUFF CTO","SB 1AS","SB BI"],"colecoes":["ABIMAD - 2025"]},"MODELO SOFA BAG":{"cod":"20640","modulacoes":["2B 1AS"],"colecoes":["ESTUDIOBOLA - 2025"]},"MODELO SOFA AIDA":{"cod":"20643","modulacoes":["2B 1AS"],"colecoes":["ESTUDIOBOLA - 2025"]},"MODELO FLOGE":{"cod":"20645","modulacoes":["1B 1AS","2B 1AS","CH 1B","CTO CH","PUFF","SB 1AS","SB BI"],"colecoes":["PREVIEW - 2025"]},"MODELO GROOVE":{"cod":"20646","modulacoes":["1B 1AS","2B 1AS","CH 1B","PUFF","PUFF BI","PUFF MEIO","SB 1AS","SB BI","SB CURVO"],"colecoes":["PREVIEW - 2025"]},"MODELO GAUDI":{"cod":"20647","modulacoes":["1B 1AS","2B 1AS","CH 1B","CH SB","CTO ALONGADO","PUFF","PUFF MEIO","SB 1AS","SB BI"],"colecoes":["PREVIEW - 2025"]},"MODELO PATOU":{"cod":"20648","modulacoes":["1B + 1B","1B + SB + 1B","1B + SB + CTO","1B + SB + PUFF BI","1B + SB + SB","1B 1AS + SB 1AS","CH 1B","CTO","SB + SB + PUFF BI","SB 1AS + CTO","SB 1AS + PUFF BI","SB 1AS + SB 1AS"],"colecoes":["PREVIEW - 2025"]},"MODELO TASSEL":{"cod":"20650","modulacoes":["1B BI","1B BI CURVO","2B 1AS","2B CURVO","CH AV"],"colecoes":["PREVIEW - 2025"]},"MODELO VILLA LOBOS":{"cod":"20651","modulacoes":["1B 1AS","2B 1AS","CH 1B","CTO CH","SB 1AS","SB BI","SB CURVO"],"colecoes":["PREVIEW - 2025"]},"MODELO KLEE":{"cod":"20655","modulacoes":["1B 1AS","2B 2AS","CH 1B","CTO","PUFF","PUFF BI","PUFF CTO","PUFF MEIO","SB 1AS"],"colecoes":["ABIMAD - 2026"]},"MODELO ORFEO":{"cod":"20656","modulacoes":["1B 1AS","1B CURVO","2B 1AS","CH 1B","PUFF","PUFF BI","PUFF MEIO","SB 1AS"],"colecoes":["SACCARO - 2025"]},"MODELO OTTE":{"cod":"20657","modulacoes":["1B 1AS","2B 1AS"],"colecoes":["ABIMAD - 2026"]},"MODELO PROUVE":{"cod":"20658","modulacoes":["1B 1AS","CANTO","CH 1B","PUFF","PUFF BI","PUFF MEIO","SB 1AS","SB BI"],"colecoes":["ABIMAD - 2026"]},"MODELO SYSTEM":{"cod":"20659","modulacoes":["1B + 1B","1B + SB + 1B","1B 1AS + SB 1AS","CH 1B","CTO","PUFF CTO","PUFF MEIO","SB 1AS + CTO","SB 1AS + SB 1AS"],"colecoes":["ABIMAD - 2026"]},"MODELO FLINT":{"cod":"20660","modulacoes":["1B 1AS","1B 2AS","2B 2AS","CEV","CH 1B","CTO","POL","PUFF","PUFF BI","PUFF CTO","SB 1AS","SB 2AS","SB BI"],"colecoes":["ABIMAD - 2026"]},"MODELO CLIFF":{"cod":"20661","modulacoes":["1B 1AS","1B 2AS","2B 2AS","APARADOR","CEV","CH 1B","CH SB","CTO","PUFF","PUFF BI","PUFF CTO","PUFF CURVO","PUFF MEIO","SB 1AS","SB 2AS","SB BI","SB CURVO"],"colecoes":["ABIMAD - 2026"]},"MODELO LIOR":{"cod":"20662","modulacoes":["1B 1AS","1B BI CURVO","1B CURVO","2B 2AS","CH 1B","CTO","PUFF","PUFF CTO","SB 1AS","SB BI"],"colecoes":["ABIMAD - 2026"]},"MODELO OASI":{"cod":"20663","modulacoes":["1B + 1B","1B 1AS","1B 2AS","2B 2AS","CEV","CH 1B","CH AV","CTO","PUFF","PUFF CTO","SB 1AS","SB 2AS"],"colecoes":["ABIMAD - 2026"]},"MODELO UMFELD":{"cod":"20664","modulacoes":["1B 1AS","CTO CH","PUFF BI","PUFF MEIO","SB 1AS"],"colecoes":["ABIMAD - 2026"]},"MODELO ATTO":{"cod":"20665","modulacoes":["1B 1AS + PUFF MEIO","1B 2AS","2B 2AS","2B 3AS","CH 1B","CTO CH","PUFF","SB 1AS + PUFF BI"],"colecoes":["ABIMAD - 2026"]},"MODELO CODE":{"cod":"20667","modulacoes":["1B 1AS","1B CURVO","CH 1B","CH 1B REDONDA","CTO","PUFF","PUFF BI","PUFF MEIO","SB 1AS"],"colecoes":["ABIMAD - 2026"]},"MODELO DOM":{"cod":"21001","modulacoes":["1B 1AS","CH 1B","CTO","SB 1AS","SB BI"],"colecoes":["PREVIEW - 2017"]},"MODELO CARTIER":{"cod":"21008","modulacoes":["2B 1AS"],"colecoes":["ABIMAD - 2018"]},"MODELO NEW CARUZO":{"cod":"21009","modulacoes":["1B 1AS","CTO","PUFF","SB 1AS","SB BI"],"colecoes":["ABIMAD - 2017"]},"MODELO CRES":{"cod":"21012","modulacoes":["2B 1AS"],"colecoes":["PREVIEW - 2017"]},"MODELO NEW LIVORNO":{"cod":"21020","modulacoes":["1B 1AS","CH 1B","CTO","PUFF","PUFF CTO","SB 1AS","SB BI"],"colecoes":["ABIMAD - 2017"]},"MODELO SCORPIUS":{"cod":"21036","modulacoes":["2B 2AS"],"colecoes":["ABIMAD - 2017"]},"MODELO SNOOZE":{"cod":"21038","modulacoes":["2B 2AS"],"colecoes":[]},"MODELO AXEL":{"cod":"21045","modulacoes":["1B 1AS","2B 2AS","CH 1B","CTO","PUFF","PUFF CTO","SB 1AS","SB BI"],"colecoes":[]},"MODELO SAO PAULO":{"cod":"21047","modulacoes":["1B 1AS","CH 1B","CTO","PUFF","PUFF CTO","SB 1AS","SB BI"],"colecoes":["PREVIEW - 2019"]},"MODELO HOZIER":{"cod":"21050","modulacoes":["1B 1AS","2B 2AS","CH 1B","CTO","PUFF","PUFF CTO","SB 1AS","SB BI"],"colecoes":[]},"MODELO CYRUS":{"cod":"21051","modulacoes":["1B 1AS","2B 2AS","CH 1B","CTO","PUFF","PUFF CTO","SB 1AS","SB BI"],"colecoes":[]},"MODELO MONTEVIDEO":{"cod":"21054","modulacoes":["1B 1AS","CH 1B","CTO","PUFF","PUFF CTO","PUFF MEIO","SB 1AS","SB BI"],"colecoes":["ABIMAD - 2020"]},"MODELO AKON":{"cod":"21056","modulacoes":["1B 1AS","2B 2AS","CH 1B","CTO","PUFF","SB 1AS","SB BI"],"colecoes":[]},"MODELO MERCURY":{"cod":"21059","modulacoes":["1B 1AS","2B 2AS","CH 1B","PUFF","SB 1AS"],"colecoes":[]},"MODELO MORRISON":{"cod":"21060","modulacoes":["1B 1AS","2B 2AS","CH 1B","CTO","PUFF","PUFF CTO","SB 1AS","SB BI"],"colecoes":["ABIMAD - 2019"]},"MODELO PASS":{"cod":"21061","modulacoes":["1B 1AS","2B 2AS","CH 1B","CTO","PUFF","PUFF CTO","SB 1AS","SB BI"],"colecoes":["PREVIEW - 2018"]},"MODELO SANZ":{"cod":"21062","modulacoes":["1B 1AS","2B 2AS","CH 1B","PUFF","SB 1AS"],"colecoes":[]},"MODELO COBAIN":{"cod":"21065","modulacoes":["2B 1AS","POL"],"colecoes":["PREVIEW - 2018"]},"MODELO COLEMAN":{"cod":"21066","modulacoes":["2B 1AS"],"colecoes":[]},"MODELO NEW CALVIN":{"cod":"21068","modulacoes":["1B 1AS","CH 1B","CTO","PUFF","PUFF CTO","SB 1AS","SB BI"],"colecoes":["BRETON - 2020"]},"MODELO LISBOA":{"cod":"21069","modulacoes":["1B 1AS","CH 1B","CTO","PUFF","PUFF CTO","SB 1AS","SB BI"],"colecoes":[]},"MODELO POLO":{"cod":"21070","modulacoes":["1B 1AS","2B 2AS","CH 1B","CTO","PUFF","SB 1AS"],"colecoes":[]},"MODELO QUEEN":{"cod":"21071","modulacoes":["2B 1AS"],"colecoes":["BRETON - 2018"]},"MODELO CALVIN":{"cod":"21080","modulacoes":["1B 1AS","CH 1B","CTO","SB 1AS","SB BI"],"colecoes":[]},"MODELO PIGUET":{"cod":"21087","modulacoes":["2B 1AS","POL"],"colecoes":[]},"MODELO COBAIN CORPORATIVO":{"cod":"21102","modulacoes":["POL","SOFA CAMA"],"colecoes":["PREVIEW - 2018"]},"MODELO BERILLO":{"cod":"21114","modulacoes":["1B 1AS","CH 1B","SB 1AS"],"colecoes":[]},"MODELO YANKEE HOTEL":{"cod":"21115","modulacoes":["2B 2AS"],"colecoes":[]},"MODELO URSOVA":{"cod":"21128","modulacoes":["1B 1AS","CH 1B","CTO","PUFF","PUFF CTO","SB 1AS","SB BI"],"colecoes":["ABIMAD - 2022"]},"MODELO BERAT":{"cod":"21130","modulacoes":["1B 1AS","1B S/ENC","CH 1B","CTO","PUFF","PUFF CTO","SB 1AS","SB BI"],"colecoes":["ABIMAD - 2022"]},"MODELO NEW NORMANDIA":{"cod":"21135","modulacoes":["1B 1AS","1B 1AS/1B 1AS","CH 1B","CTO","CTO/CTO","PUFF","PUFF BI","PUFF CTO","PUFF MEIO","SB 1AS","SB 1AS/SB 1AS","SB BI"],"colecoes":["PREVIEW - 2017"]},"MODELO FLOW":{"cod":"21136","modulacoes":["1B 1AS","CH 1B","CTO","PUFF","PUFF BI","PUFF MEIO","SB 1AS","SB BI"],"colecoes":["ABIMAD - 2023"]},"MODELO JASPER":{"cod":"21137","modulacoes":["1B 1AS","APARADOR","CTO","PUFF CTO","SB 1AS","SB BI"],"colecoes":[]},"MODELO QUILL":{"cod":"21139","modulacoes":["2B 1AS"],"colecoes":["PONTOVIRGULA - 2023"]},"MODELO NIMBUS":{"cod":"21143","modulacoes":["1B 1AS","2B 2AS","CTO","SB 1AS","SB BI"],"colecoes":["PREVIEW - 2023"]},"MODELO HAZEL":{"cod":"21146","modulacoes":["1B + 1B","1B + SB + 1B","2B 2AS","2B 3AS"],"colecoes":["PREVIEW - 2023"]},"MODELO FIUME":{"cod":"21151","modulacoes":["1B 1AS","2B 2AS","CH 1B","CTO","PUFF BI","PUFF CTO","PUFF MEIO","SB 1AS","SB BI"],"colecoes":["ABIMAD - 2024"]},"MODELO LAGO":{"cod":"21152","modulacoes":["1B 1AS","2B 2AS","CH 1B","CTO","PUFF BI","PUFF CTO","PUFF MEIO","SB 1AS","SB BI"],"colecoes":["ABIMAD - 2024"]},"MODELO ZEN":{"cod":"21153","modulacoes":["1B 1AS","2B 2AS","CH 1B","CTO","PUFF BI","PUFF CTO","PUFF MEIO","SB 1AS","SB BI"],"colecoes":["PRIVATE LABEL"]},"MODELO CARBONO 10":{"cod":"21155","modulacoes":["1B 1AS","2B 1AS"],"colecoes":["PRIVATE LABEL"]},"MODELO ZISSOU":{"cod":"21157","modulacoes":["1B 1AS","2B 1AS","POL"],"colecoes":[]},"MODELO ELLIE":{"cod":"21165","modulacoes":["1B 1AS","2B 2AS","CH 1B","PUFF","SB 1AS","SB BI"],"colecoes":["ABIMAD - 2025"]},"MODELO CAMA&SOFA":{"cod":"21169","modulacoes":["1B + 1B","2B 1AS"],"colecoes":[]},"MODELO NAVY":{"cod":"21171","modulacoes":["1B 1AS","CH 1B","CH SB","CTO","PUFF","PUFF BI","PUFF MEIO","SB 1AS","SB BI"],"colecoes":["PREVIEW - 2025"]},"MODELO LAGO MOTORIZADO":{"cod":"21172","modulacoes":["1B 1AS","SB 1AS"],"colecoes":[]},"MODELO FIUME MOTORIZADO":{"cod":"21173","modulacoes":["2B 2AS"],"colecoes":[]},"MODELO MANIFOLD":{"cod":"21175","modulacoes":["1B 1AS","CANTO","CH 1B","PUFF BI","PUFF MEIO","SB 1AS","SB BI"],"colecoes":["ABIMAD - 2026"]},"MODELO MODUM":{"cod":"21179","modulacoes":["1B 1AS","2B 2AS","CH 1B","CTO","PUFF","PUFF BI","PUFF CTO","PUFF MEIO","SB 1AS","SB BI"],"colecoes":["ABIMAD - 2026"]},"MODELO FINN":{"cod":"21180","modulacoes":["1B 1AS","CH 1B","CTO","PUFF","PUFF CTO","SB 1AS","SB BI"],"colecoes":["ABIMAD - 2026"]},"MODELO C10":{"cod":"21181","modulacoes":["1B 1AS","2B 1AS"],"colecoes":["PRIVATE LABEL"]},"MODELO RIALTO":{"cod":"21505","modulacoes":["1B + PUFF BI","1B 1AS","1B 1AS + PUFF MEIO","1B 2AS","2B 2AS","2B 3AS","CTO CH","PUFF BI","PUFF CTO","PUFF MEIO","SB 1AS","SB 2AS"],"colecoes":["ABIMAD - 2023"]},"MODELO CROMIE":{"cod":"21512","modulacoes":["1B 1AS","2B 1AS","PUFF","SB 1AS"],"colecoes":["ABIMAD - 2025"]},"MODELO VINCE":{"cod":"21513","modulacoes":["1B 1AS","2B 1AS","PUFF","SB 1AS"],"colecoes":[]},"MODELO ACCOR":{"cod":"22003","modulacoes":["POL"],"colecoes":[]},"MODELO NEW ASIA":{"cod":"22011","modulacoes":["POL","PUFF"],"colecoes":["PREVIEW - 2018"]},"MODELO NEA":{"cod":"22048","modulacoes":["POL","PUFF"],"colecoes":["PREVIEW - 2017"]},"MODELO CARTAGENA":{"cod":"22078","modulacoes":["POL"],"colecoes":["PREVIEW - 2019"]},"MODELO GUADALAJARA":{"cod":"22079","modulacoes":["POL","PUFF"],"colecoes":["PREVIEW - 2019"]},"MODELO MEDELIN":{"cod":"22081","modulacoes":["POL"],"colecoes":["PREVIEW - 2019"]},"MODELO AMY":{"cod":"22089","modulacoes":["POL"],"colecoes":[]},"MODELO CHER":{"cod":"22091","modulacoes":["POL"],"colecoes":[]},"MODELO COURTNEY":{"cod":"22092","modulacoes":["POL"],"colecoes":[]},"MODELO DEBBIE":{"cod":"22093","modulacoes":["POL"],"colecoes":[]},"MODELO KATY":{"cod":"22095","modulacoes":["POL"],"colecoes":[]},"MODELO LADY":{"cod":"22096","modulacoes":["POL"],"colecoes":[]},"MODELO MICHAEL":{"cod":"22099","modulacoes":["POL"],"colecoes":[]},"MODELO NICKS":{"cod":"22100","modulacoes":["POL"],"colecoes":["ABIMAD - 2019"]},"MODELO PAYNE":{"cod":"22103","modulacoes":["POL"],"colecoes":[]},"MODELO TYGA":{"cod":"22107","modulacoes":["POL"],"colecoes":[]},"MODELO BLUME":{"cod":"22113","modulacoes":["POL"],"colecoes":[]},"MODELO CHARM":{"cod":"22114","modulacoes":["POL"],"colecoes":[]},"MODELO DELGADA":{"cod":"22116","modulacoes":["POL"],"colecoes":[]},"MODELO GAU":{"cod":"22117","modulacoes":["POL"],"colecoes":[]},"MODELO GODIVA":{"cod":"22118","modulacoes":["POL"],"colecoes":[]},"MODELO SANABRIA":{"cod":"22124","modulacoes":["POL"],"colecoes":[]},"MODELO STAN":{"cod":"22125","modulacoes":["POL"],"colecoes":[]},"MODELO TOULON":{"cod":"22126","modulacoes":["POL","PUFF"],"colecoes":[]},"MODELO CASTRO":{"cod":"22129","modulacoes":["POL","PUFF"],"colecoes":[]},"MODELO ROYAL":{"cod":"22132","modulacoes":["POL"],"colecoes":[]},"MODELO VALENTINA":{"cod":"22134","modulacoes":["POL"],"colecoes":[]},"MODELO GIRASSOL":{"cod":"22135","modulacoes":["POL"],"colecoes":[]},"MODELO NEW AQUILA":{"cod":"22138","modulacoes":["POL","PUFF"],"colecoes":["BRETON - 2019"]},"MODELO CONSTANTINA":{"cod":"22149","modulacoes":["POL","PUFF"],"colecoes":["SACCARO - 2021"]},"MODELO ALMERIA":{"cod":"22152","modulacoes":["POL","PUFF"],"colecoes":["HOME EXPERIENCE - 2020"]},"MODELO LIBIA":{"cod":"22153","modulacoes":["POL"],"colecoes":["HOME EXPERIENCE - 2020"]},"MODELO SANTA":{"cod":"22200","modulacoes":["POL"],"colecoes":[]},"MODELO ELLIS":{"cod":"22212","modulacoes":["POL","PUFF"],"colecoes":[]},"MODELO KAVAJI":{"cod":"22223","modulacoes":["POL","PUFF"],"colecoes":["HOME EXPERIENCE - 2020"]},"MODELO BENAGIL":{"cod":"22224","modulacoes":["POL","PUFF"],"colecoes":["BRETON - 2022"]},"MODELO AGHATA PLUS":{"cod":"22226","modulacoes":["POL","PUFF"],"colecoes":["PREVIEW - 2017"]},"MODELO BUMBO":{"cod":"22229","modulacoes":["POL"],"colecoes":[]},"MODELO PALERMO PLUS":{"cod":"22233","modulacoes":["POL","PUFF"],"colecoes":["ABIMAD - 2017"]},"MODELO EDESSA":{"cod":"22246","modulacoes":["POL","PUFF"],"colecoes":["ABIMAD - 2022"]},"MODELO BROA":{"cod":"22255","modulacoes":["POL","PUFF"],"colecoes":["BRETON - 2022"]},"MODELO CAMILO":{"cod":"22256","modulacoes":["POL","PUFF"],"colecoes":["BRETON - 2022"]},"MODELO SERVIA":{"cod":"22264","modulacoes":["POL"],"colecoes":["ABIMAD - 2022"]},"MODELO MUNTENIA":{"cod":"22269","modulacoes":["POL","PUFF"],"colecoes":["ABIMAD - 2022"]},"MODELO CATALUNIA":{"cod":"22286","modulacoes":["POL"],"colecoes":["ABIMAD - 2023"]},"MODELO CECILE":{"cod":"22287","modulacoes":["POL"],"colecoes":["ABIMAD - 2023"]},"MODELO ABACO":{"cod":"22288","modulacoes":["POL"],"colecoes":["ABIMAD - 2023"]},"MODELO ELYSIAN":{"cod":"22289","modulacoes":["POL"],"colecoes":["ABIMAD - 2023"]},"MODELO POSITANO":{"cod":"22290","modulacoes":["POL"],"colecoes":["ABIMAD - 2023"]},"MODELO FIDDA":{"cod":"22292","modulacoes":["POL"],"colecoes":["ABIMAD - 2023"]},"MODELO SUBLIME":{"cod":"22294","modulacoes":["POL","PUFF"],"colecoes":["ABIMAD - 2023"]},"MODELO NEW HARRY":{"cod":"22299","modulacoes":["POL"],"colecoes":["ABIMAD - 2019"]},"MODELO ACLIVE":{"cod":"22302","modulacoes":["MESA","POL","PUFF"],"colecoes":["ISALONI - 2023"]},"MODELO NEW MALIQ":{"cod":"22303","modulacoes":["POL","PUFF"],"colecoes":[]},"MODELO BLANK":{"cod":"22305","modulacoes":["POL"],"colecoes":[]},"MODELO ORBE":{"cod":"22306","modulacoes":["POL","PUFF"],"colecoes":["PONTOVIRGULA - 2023"]},"MODELO HARPER":{"cod":"22308","modulacoes":["POL","PUFF"],"colecoes":["PONTOVIRGULA - 2023"]},"MODELO LIBRA":{"cod":"22309","modulacoes":["POL","PUFF"],"colecoes":["BRETON - 2023"]},"MODELO GINGER":{"cod":"22316","modulacoes":["POL","PUFF"],"colecoes":["BRETON - 2023"]},"MODELO NEW BLAKE":{"cod":"22320","modulacoes":["POL"],"colecoes":["ABIMAD - 2017"]},"MODELO CARAMELLE":{"cod":"22322","modulacoes":["POL","PUFF"],"colecoes":["BRETON - 2023"]},"MODELO FADO":{"cod":"22324","modulacoes":["POL"],"colecoes":["BRETON - 2023"]},"MODELO ODISSEIA":{"cod":"22327","modulacoes":["POL"],"colecoes":["PREVIEW - 2023"]},"MODELO GIZA":{"cod":"22328","modulacoes":["POL"],"colecoes":["PREVIEW - 2023"]},"MODELO SABRE":{"cod":"22332","modulacoes":["POL","PUFF"],"colecoes":["PREVIEW - 2023"]},"MODELO BLUMEN":{"cod":"22335","modulacoes":["POL","PUFF"],"colecoes":["PREVIEW - 2023"]},"MODELO MOZZI":{"cod":"22353","modulacoes":["POL"],"colecoes":["BRETON - 2024"]},"MODELO LIGURE":{"cod":"22360","modulacoes":["POL"],"colecoes":["ABIMAD - 2024"]},"MODELO FLEURIR":{"cod":"22371","modulacoes":["POL"],"colecoes":["PREVIEW - 2024"]},"MODELO CALIN":{"cod":"22373","modulacoes":["POL"],"colecoes":["PREVIEW - 2024"]},"MODELO AME":{"cod":"22374","modulacoes":["POL"],"colecoes":["PREVIEW - 2024"]},"MODELO ELAN":{"cod":"22375","modulacoes":["POL"],"colecoes":["PREVIEW - 2024"]},"MODELO C245":{"cod":"22379","modulacoes":["POL"],"colecoes":[]},"MODELO ARENA":{"cod":"22381","modulacoes":["POL"],"colecoes":[]},"MODELO COCON":{"cod":"22382","modulacoes":["POL"],"colecoes":["PREVIEW - 2024"]},"MODELO EDIFIANTE":{"cod":"22386","modulacoes":["POL"],"colecoes":["PREVIEW - 2024"]},"MODELO INTIMITE":{"cod":"22387","modulacoes":["POL"],"colecoes":["PREVIEW - 2024"]},"MODELO CUMBUCO":{"cod":"22389","modulacoes":["POL"],"colecoes":[]},"MODELO NEW OSCAR VIP":{"cod":"22390","modulacoes":["POL","POL DUPLA"],"colecoes":[]},"MODELO NEW OSCAR CLASSICA":{"cod":"22391","modulacoes":["ASS INFANTIL","POL","POL 1B"],"colecoes":[]},"MODELO DEZZA":{"cod":"22394","modulacoes":["POL"],"colecoes":["ABIMAD - 2025"]},"MODELO JENNY":{"cod":"22395","modulacoes":["POL"],"colecoes":["ABIMAD - 2025"]},"MODELO BELLE":{"cod":"22397","modulacoes":["POL"],"colecoes":["ABIMAD - 2025"]},"MODELO MIYA":{"cod":"22398","modulacoes":["POL"],"colecoes":["ABIMAD - 2025"]},"MODELO WEG":{"cod":"22399","modulacoes":["POL"],"colecoes":["ABIMAD - 2025"]},"MODELO PERRY":{"cod":"22402","modulacoes":["POL"],"colecoes":["ABIMAD - 2025"]},"MODELO SANTE":{"cod":"22404","modulacoes":["POL","PUFF"],"colecoes":["ABIMAD - 2025"]},"MODELO SENSE":{"cod":"22405","modulacoes":["1B + CONSOLE","1B + CONSOLE + 1B","1B + SB + 1B","1B + SB + SB","1B + SB + SB + 1B","1B + SB CON + CON + 1B","1B + SB CON + SB CON","1B + SB CONSOLE","1B + SB CONSOLE + 1B","1B 1AS","1B 1AS + SB 1AS","CONSOLE","SB 1AS","SB CONSOLE","SB CONSOLE + CONSOLE"],"colecoes":["ABIMAD - 2025"]},"MODELO PLI":{"cod":"22409","modulacoes":["POL","PUFF"],"colecoes":["PREVIEW - 2025"]},"MODELO AIDA":{"cod":"22410","modulacoes":["POL"],"colecoes":["ESTUDIOBOLA - 2025"]},"MODELO LIZZ":{"cod":"22411","modulacoes":["POL"],"colecoes":["PREVIEW - 2025"]},"MODELO BAG":{"cod":"22412","modulacoes":["POL","PUFF"],"colecoes":["ESTUDIOBOLA - 2025"]},"MODELO KING":{"cod":"22415","modulacoes":["POL","PUFF"],"colecoes":["ESTUDIOBOLA - 2025"]},"MODELO ANNE":{"cod":"22416","modulacoes":["POL"],"colecoes":["PREVIEW - 2025"]},"MODELO NORAH":{"cod":"22417","modulacoes":["POL"],"colecoes":["PREVIEW - 2025"]},"MODELO AURIC":{"cod":"22419","modulacoes":["POL"],"colecoes":["PREVIEW - 2025"]},"MODELO BOEMI":{"cod":"22420","modulacoes":["POL","PUFF"],"colecoes":["PREVIEW - 2025"]},"MODELO MALFATTI":{"cod":"22421","modulacoes":["POL"],"colecoes":["PREVIEW - 2025"]},"MODELO BRASS":{"cod":"22422","modulacoes":["POL"],"colecoes":["PREVIEW - 2025"]},"MODELO CICCIO":{"cod":"22425","modulacoes":["POL","PUFF"],"colecoes":["PRIVATE LABEL"]},"MODELO POLTRONA FLOGE":{"cod":"22429","modulacoes":["POL"],"colecoes":["ABIMAD - 2026"]},"MODELO BOEMI BALANCO":{"cod":"22431","modulacoes":["POL"],"colecoes":["ABIMAD - 2026"]},"MODELO WASS":{"cod":"22432","modulacoes":["POL"],"colecoes":["ABIMAD - 2026"]},"MODELO SONA":{"cod":"22433","modulacoes":["POL"],"colecoes":["ABIMAD - 2026"]},"MODELO LINA":{"cod":"22434","modulacoes":["POL","PUFF"],"colecoes":["ABIMAD - 2026"]},"MODELO TESS":{"cod":"22435","modulacoes":["POL"],"colecoes":["ABIMAD - 2026"]},"MODELO BAUEN":{"cod":"22436","modulacoes":["POL"],"colecoes":["ABIMAD - 2026"]},"MODELO ORIS":{"cod":"22450","modulacoes":["POL"],"colecoes":["ABIMAD - 2026"]},"MODELO AXIS":{"cod":"22451","modulacoes":["POL"],"colecoes":["ABIMAD - 2026"]},"MODELO LIESEL":{"cod":"22452","modulacoes":["POL","PUFF"],"colecoes":["ABIMAD - 2026"]},"MODELO DOMIA":{"cod":"22453","modulacoes":["POL"],"colecoes":["ABIMAD - 2026"]},"MODELO KLARIS":{"cod":"22454","modulacoes":["POL","PUFF"],"colecoes":["ABIMAD - 2026"]},"MODELO STOLZ":{"cod":"22455","modulacoes":["POL","PUFF"],"colecoes":["ABIMAD - 2026"]},"MODELO LINEA":{"cod":"22456","modulacoes":["POL","PUFF"],"colecoes":["ABIMAD - 2026"]},"MODELO IVY":{"cod":"22457","modulacoes":["POL","PUFF"],"colecoes":["ABIMAD - 2026"]},"MODELO IRIS":{"cod":"22458","modulacoes":["POL"],"colecoes":["ABIMAD - 2026"]},"MODELO SPUR":{"cod":"22459","modulacoes":["POL"],"colecoes":["ABIMAD - 2026"]},"MODELO ALAVA":{"cod":"23001","modulacoes":["PUFF"],"colecoes":["PREVIEW - 2018"]},"MODELO CANTABYA":{"cod":"23003","modulacoes":["PUFF"],"colecoes":["PREVIEW - 2018"]},"MODELO NAVARRA":{"cod":"23007","modulacoes":["PUFF"],"colecoes":["PREVIEW - 2018"]},"MODELO RENASCENCE":{"cod":"23009","modulacoes":["PUFF"],"colecoes":["ABIMAD - 2017"]},"MODELO NEW ROMANO":{"cod":"23010","modulacoes":["BANQUETA BAR","BANQUETA ILHA","MESA","PUFF"],"colecoes":["ABIMAD - 2017"]},"MODELO SEY":{"cod":"23013","modulacoes":["PUFF"],"colecoes":["ABIMAD - 2017"]},"MODELO ZIMER":{"cod":"23015","modulacoes":["MESA","PUFF"],"colecoes":["PREVIEW - 2017"]},"MODELO UFO":{"cod":"23016","modulacoes":["PUFF"],"colecoes":["PREVIEW - 2018"]},"MODELO BUENOS AIRES":{"cod":"23017","modulacoes":["PUFF"],"colecoes":["PREVIEW - 2019"]},"MODELO SUCRE":{"cod":"23018","modulacoes":["PUFF"],"colecoes":["PREVIEW - 2019"]},"MODELO ASSUNCAO":{"cod":"23020","modulacoes":["PUFF"],"colecoes":["PREVIEW - 2019"]},"MODELO CASH":{"cod":"23021","modulacoes":["PUFF"],"colecoes":["ABIMAD - 2019"]},"MODELO DUKE":{"cod":"23022","modulacoes":["PUFF"],"colecoes":[]},"MODELO GORDAN":{"cod":"23023","modulacoes":["PUFF"],"colecoes":[]},"MODELO PLANT":{"cod":"23024","modulacoes":["PUFF"],"colecoes":["ABIMAD - 2019"]},"MODELO REED":{"cod":"23025","modulacoes":["ALMOFADA ASSENTO","PUFF"],"colecoes":["ABIMAD - 2019"]},"MODELO AROS":{"cod":"23026","modulacoes":["PUFF"],"colecoes":[]},"MODELO EGON":{"cod":"23028","modulacoes":["PUFF"],"colecoes":[]},"MODELO DINAMO":{"cod":"23031","modulacoes":["PUFF"],"colecoes":[]},"MODELO TUK":{"cod":"23033","modulacoes":["PUFF"],"colecoes":[]},"MODELO ALCALA":{"cod":"23040","modulacoes":["PUFF"],"colecoes":["HOME EXPERIENCE - 2020"]},"MODELO C419":{"cod":"23056","modulacoes":["PUFF MESA"],"colecoes":[]},"MODELO KIDS CADEIRA":{"cod":"23057","modulacoes":["CADEIRA"],"colecoes":[]},"MODELO ADULTO":{"cod":"23058","modulacoes":["BANQUETA","CADEIRA"],"colecoes":[]},"MODELO RECONCAVO":{"cod":"23059","modulacoes":["CADEIRA"],"colecoes":[]},"MODELO NUVIA":{"cod":"23061","modulacoes":["PUFF"],"colecoes":["ABIMAD - 2026"]},"MODELO DESSAU":{"cod":"23062","modulacoes":["PUFF"],"colecoes":["ABIMAD - 2026"]},"MODELO DALI":{"cod":"24003","modulacoes":["BANCO"],"colecoes":["ABIMAD - 2017"]},"MODELO VERNASA":{"cod":"24006","modulacoes":["BANCO"],"colecoes":["ABIMAD - 2017"]},"MODELO GRAZ":{"cod":"24007","modulacoes":["BANCO"],"colecoes":["PREVIEW - 2017"]},"MODELO CARTER":{"cod":"24011","modulacoes":["BANCO"],"colecoes":[]},"MODELO KIROPE":{"cod":"24013","modulacoes":["BANCO"],"colecoes":[]},"MODELO DETALHE GRAZ":{"cod":"24015","modulacoes":["BANCO"],"colecoes":["PREVIEW - 2017"]},"MODELO VALEA":{"cod":"24026","modulacoes":["BANCO"],"colecoes":["ABIMAD - 2022"]},"MODELO DEVA":{"cod":"24027","modulacoes":["BANCO"],"colecoes":["ABIMAD - 2023"]},"MODELO OLTENIA":{"cod":"24028","modulacoes":["BANCO"],"colecoes":["ABIMAD - 2022"]},"MODELO FLORENTINE":{"cod":"24030","modulacoes":["BANCO"],"colecoes":["ABIMAD - 2023"]},"MODELO BANCO ONIROS":{"cod":"24031","modulacoes":["BANCO"],"colecoes":["ABIMAD - 2023"]},"MODELO BANCO POMME":{"cod":"24035","modulacoes":["BANCO"],"colecoes":["PREVIEW - 2023"]},"MODELO VITALITE":{"cod":"24042","modulacoes":["BANCO"],"colecoes":["PREVIEW - 2024"]},"MODELO CHARMANT":{"cod":"24043","modulacoes":["BANCO"],"colecoes":["PREVIEW - 2024"]},"MODELO VIE":{"cod":"24044","modulacoes":["BANCO"],"colecoes":["PREVIEW - 2024"]},"MODELO AMELIA":{"cod":"25001","modulacoes":["BANQUETA BAR","BANQUETA ILHA","CADEIRA"],"colecoes":["ABIMAD - 2018"]},"MODELO ROUND":{"cod":"25003","modulacoes":["BANQUETA BAR","BANQUETA ILHA","CADEIRA"],"colecoes":["ABIMAD - 2017"]},"MODELO PIERRE":{"cod":"25004","modulacoes":["BANQUETA BAR"],"colecoes":[]},"MODELO GIORNATTA":{"cod":"25008","modulacoes":["CADEIRA"],"colecoes":["PREVIEW - 2023"]},"MODELO MARIA":{"cod":"25014","modulacoes":["BANQUETA"],"colecoes":[]},"MODELO LAUTREC":{"cod":"25015","modulacoes":["BANQUETA"],"colecoes":["PREVIEW - 2025"]},"MODELO MADELEINE":{"cod":"25016","modulacoes":["BANQUETA"],"colecoes":["PREVIEW - 2025"]},"MODELO SAPPHIR":{"cod":"25017","modulacoes":["BANQUETA"],"colecoes":["PREVIEW - 2025"]},"MODELO MESA LA PAZ":{"cod":"26007","modulacoes":["MESA AP"],"colecoes":["PREVIEW - 2019"]},"MODELO MESA MONTERIA":{"cod":"26008","modulacoes":["MESA"],"colecoes":["PREVIEW - 2019"]},"MODELO MESA PISAC":{"cod":"26009","modulacoes":["MESA"],"colecoes":["PREVIEW - 2019"]},"MODELO MESA SANTIAGO":{"cod":"26010","modulacoes":["MESA"],"colecoes":["PREVIEW - 2019"]},"MODELO MESA BONO":{"cod":"26012","modulacoes":["MESA"],"colecoes":["ABIMAD - 2019"]},"MODELO MESA SAKAI":{"cod":"26015","modulacoes":["MESA","MESA AP"],"colecoes":["HOME EXPERIENCE - 2020"]},"MODELO MESA NICEIA":{"cod":"26018","modulacoes":["MESA"],"colecoes":["HOME EXPERIENCE - 2020"]},"MODELO MESA ALEXANDRIA":{"cod":"26021","modulacoes":["MESA"],"colecoes":["HOME EXPERIENCE - 2020"]},"MODELO MESA VISCRI":{"cod":"26030","modulacoes":["MESA"],"colecoes":["ABIMAD - 2022"]},"MODELO MESA NEW VISCAIA":{"cod":"26032","modulacoes":["MESA"],"colecoes":["PREVIEW - 2018"]},"MODELO MESA ONDINA":{"cod":"26037","modulacoes":["MESA","MESA LATERAL"],"colecoes":["ABIMAD - 2023"]},"MODELO MESA DUNE":{"cod":"26038","modulacoes":["MESA CENTRO","MESA LATERAL"],"colecoes":["ABIMAD - 2026"]},"MODELO MESA MINOS":{"cod":"26039","modulacoes":["MESA","MESA CENTRO"],"colecoes":["ABIMAD - 2023"]},"MODELO MESA SATURNIA":{"cod":"26040","modulacoes":["MESA","MESA CENTRO"],"colecoes":["ABIMAD - 2023"]},"MODELO MESA SUBLIME MESA":{"cod":"26041","modulacoes":["MESA"],"colecoes":["ABIMAD - 2023"]},"MODELO MESA MUSH":{"cod":"26043","modulacoes":["MESA","MESA CENTRO"],"colecoes":["ABIMAD - 2026"]},"MODELO MESA THAI":{"cod":"26044","modulacoes":["MESA","MESA JANTAR"],"colecoes":[]},"MODELO MESA NAEVA":{"cod":"26045","modulacoes":["MESA"],"colecoes":["PREVIEW - 2023"]},"MODELO MESA ZEST":{"cod":"26046","modulacoes":["MESA","MESA JANTAR","PEDESTAL"],"colecoes":["PREVIEW - 2023"]},"MODELO MESA REINO":{"cod":"26047","modulacoes":["MESA","MESA CENTRO","MESA LATERAL"],"colecoes":["PREVIEW - 2023"]},"MODELO MESA PISTACHE":{"cod":"26048","modulacoes":["MESA","MESA JANTAR","PEDESTAL"],"colecoes":["PREVIEW - 2023"]},"MODELO MESA ROME":{"cod":"26051","modulacoes":["MESA"],"colecoes":[]},"MODELO MESA PARIS":{"cod":"26052","modulacoes":["MESA","MESA CABECEIRA"],"colecoes":["ABIMAD - 2026"]},"MODELO MESA MARIA":{"cod":"26055","modulacoes":["MESA","MESA JANTAR"],"colecoes":["ABIMAD - 2026"]},"MODELO MESA SANZIO":{"cod":"26057","modulacoes":["MESA"],"colecoes":["ABIMAD - 2024"]},"MODELO MESA BRUNELLESCHI":{"cod":"26058","modulacoes":["MESA JANTAR","PEDESTAL"],"colecoes":["ABIMAD - 2024"]},"MODELO MESA TICIANO":{"cod":"26059","modulacoes":["MESA","MESA JANTAR","PEDESTAL","SOFA TABLE"],"colecoes":["ABIMAD - 2024","ABIMAD - 2026"]},"MODELO MESA VIENNA":{"cod":"26060","modulacoes":["MESA JANTAR"],"colecoes":[]},"MODELO MESA ECLIPSE":{"cod":"26061","modulacoes":["MESA","MESA CENTRO"],"colecoes":["ABIMAD - 2026"]},"MODELO MESA TIVOLI":{"cod":"26062","modulacoes":["MESA JANTAR"],"colecoes":[]},"MODELO MESA PRIME":{"cod":"26068","modulacoes":["MESA CABECEIRA"],"colecoes":[]},"MODELO MESA BONHEUR":{"cod":"26069","modulacoes":["MESA"],"colecoes":["PREVIEW - 2024"]},"MODELO MESA METRO":{"cod":"26070","modulacoes":["MESA","MESA CENTRO"],"colecoes":[]},"MODELO MESA KIDS MESA":{"cod":"26071","modulacoes":["MESA"],"colecoes":[]},"MODELO MESA CHARMANT":{"cod":"26073","modulacoes":["MESA"],"colecoes":["PREVIEW - 2024"]},"MODELO MESA BARCELONA":{"cod":"26074","modulacoes":["MESA","MESA CABECEIRA"],"colecoes":[]},"MODELO MESA MOON":{"cod":"26075","modulacoes":["MESA CENTRO"],"colecoes":["ABIMAD - 2026"]},"MODELO MESA VIE":{"cod":"26076","modulacoes":["MESA","MESA CENTRO"],"colecoes":["PREVIEW - 2024"]},"MODELO MESA FLORA":{"cod":"26078","modulacoes":["MESA JANTAR"],"colecoes":["ABIMAD - 2026"]},"MODELO MESA PEBBLE":{"cod":"26079","modulacoes":["MESA CENTRO","MESA JANTAR"],"colecoes":["ABIMAD - 2026"]},"MODELO MESA PLATAFORM":{"cod":"26080","modulacoes":["MESA"],"colecoes":[]},"MODELO MESA LIRA":{"cod":"26081","modulacoes":["MESA"],"colecoes":[]},"MODELO MESA KONA":{"cod":"26082","modulacoes":["MESA JANTAR"],"colecoes":[]},"MODELO MESA DUO":{"cod":"26084","modulacoes":["MESA AP"],"colecoes":[]},"MODELO MESA URBAN":{"cod":"26085","modulacoes":["MESA JANTAR"],"colecoes":[]},"MODELO MESA PETRA":{"cod":"26086","modulacoes":["MESA LATERAL"],"colecoes":["ABIMAD - 2026"]},"MODELO MESA BERLIN":{"cod":"26089","modulacoes":["MESA"],"colecoes":[]},"MODELO MESA TURIN":{"cod":"26090","modulacoes":["MESA CABECEIRA"],"colecoes":["ABIMAD - 2026"]},"MODELO MESA PARIS 2D":{"cod":"26091","modulacoes":["MESA","MESA CABECEIRA"],"colecoes":[]},"MODELO MESA PARIS 6D":{"cod":"26092","modulacoes":["COMODO"],"colecoes":[]},"MODELO MESA SIENNA":{"cod":"26093","modulacoes":["MESA AP"],"colecoes":[]},"MODELO MESA CAYMAN":{"cod":"26094","modulacoes":["MESA AP","MESA CABECEIRA"],"colecoes":[]},"MODELO MESA LEAF":{"cod":"26095","modulacoes":["MESA LATERAL"],"colecoes":[]},"MODELO MESA ACCORD":{"cod":"26097","modulacoes":["MESA"],"colecoes":["ABIMAD - 2025"]},"MODELO MESA SPLENDEUR BAR":{"cod":"26098","modulacoes":["MOVEL BAR"],"colecoes":["ABIMAD - 2025"]},"MODELO MESA JOIE":{"cod":"26099","modulacoes":["MESA CABECEIRA"],"colecoes":["ABIMAD - 2025"]},"MODELO MESA MESA CABECEIRA SPLENDEUR":{"cod":"26100","modulacoes":["MESA CABECEIRA"],"colecoes":["ABIMAD - 2025"]},"MODELO MESA CLARTE":{"cod":"26101","modulacoes":["MESA HOME OFFICE"],"colecoes":["ABIMAD - 2025"]},"MODELO MESA LIZZA":{"cod":"26102","modulacoes":["MESA"],"colecoes":["ABIMAD - 2025"]},"MODELO MESA SOLEIL":{"cod":"26103","modulacoes":["MESA","MESA CENTRO"],"colecoes":["ABIMAD - 2025"]},"MODELO MESA MIRAGE":{"cod":"26104","modulacoes":["MESA"],"colecoes":["ABIMAD - 2025"]},"MODELO MESA PLATFORM":{"cod":"26105","modulacoes":["MESA"],"colecoes":[]},"MODELO MESA STARE":{"cod":"26106","modulacoes":["MESA CABECEIRA"],"colecoes":[]},"MODELO MESA ESPOIR":{"cod":"26107","modulacoes":["MESA JANTAR"],"colecoes":["ABIMAD - 2025"]},"MODELO MESA EVIE":{"cod":"26108","modulacoes":["MESA"],"colecoes":["ABIMAD - 2025"]},"MODELO MESA PARMA":{"cod":"26110","modulacoes":["MESA AP"],"colecoes":[]},"MODELO MESA POLARA":{"cod":"26111","modulacoes":["MESA"],"colecoes":["ABIMAD - 2025"]},"MODELO MESA CENTRO PICASSO":{"cod":"26113","modulacoes":["MESA CENTRO","MESA JANTAR"],"colecoes":[]},"MODELO MESA MONOLITH":{"cod":"26117","modulacoes":["MESA","MESA CENTRO"],"colecoes":["ABIMAD - 2026"]},"MODELO MESA BRICK":{"cod":"26120","modulacoes":["MESA","MESA CENTRO","MESA LATERAL"],"colecoes":["ABIMAD - 2026"]},"MODELO MESA HALO":{"cod":"26121","modulacoes":["MESA","MESA CABECEIRA"],"colecoes":[]},"MODELO MESA CALYX":{"cod":"26122","modulacoes":["MESA","MESA LATERAL"],"colecoes":[]},"MODELO MESA YOKO":{"cod":"26123","modulacoes":["MESA"],"colecoes":[]},"MODELO MESA VENTURI":{"cod":"26124","modulacoes":["MESA LATERAL"],"colecoes":["ABIMAD - 2026"]},"MODELO MESA ROMAN":{"cod":"26125","modulacoes":["MESA LATERAL"],"colecoes":[]},"MODELO MESA FITZ":{"cod":"26126","modulacoes":["MESA CENTRO"],"colecoes":["PREVIEW - 2025"]},"MODELO MESA NOIR":{"cod":"26127","modulacoes":["MESA BANDEJA","MESA CENTRO"],"colecoes":["PREVIEW - 2025"]},"MODELO MESA GATSBY":{"cod":"26128","modulacoes":["MESA CENTRO"],"colecoes":["PREVIEW - 2025"]},"MODELO MESA KLIMT":{"cod":"26129","modulacoes":["MESA JANTAR"],"colecoes":["PREVIEW - 2025"]},"MODELO MESA NUIT":{"cod":"26131","modulacoes":["MESA JANTAR","SOFA TABLE"],"colecoes":["PREVIEW - 2025"]},"MODELO MESA HENRI":{"cod":"26132","modulacoes":["MESA JANTAR"],"colecoes":["PREVIEW - 2025"]},"MODELO MESA EDGE":{"cod":"26138","modulacoes":["MESA AP"],"colecoes":[]},"MODELO MESA COLONNA":{"cod":"26139","modulacoes":["MESA LATERAL"],"colecoes":[]},"MODELO MESA HAZEL":{"cod":"26140","modulacoes":["MESA CENTRO","MESA LATERAL"],"colecoes":[]},"MODELO MESA ARCADIA":{"cod":"26141","modulacoes":["MESA JANTAR","SOFA TABLE"],"colecoes":["ABIMAD - 2026"]},"MODELO MESA BEEH":{"cod":"26142","modulacoes":["MESA LATERAL"],"colecoes":[]},"MODELO MESA ALLURE":{"cod":"26145","modulacoes":["MESA LATERAL"],"colecoes":[]},"MODELO MESA YOTT":{"cod":"26146","modulacoes":["MESA JANTAR"],"colecoes":["ABIMAD - 2026"]},"MODELO MESA ORBIT":{"cod":"26147","modulacoes":["MESA CENTRO"],"colecoes":["ABIMAD - 2026"]},"MODELO MESA BRADAN":{"cod":"26152","modulacoes":["MESA CENTRO"],"colecoes":[]},"MODELO MESA COMODA PARIS":{"cod":"26153","modulacoes":["COMODA"],"colecoes":[]},"MODELO MESA SOLE":{"cod":"26154","modulacoes":["MESA JANTAR"],"colecoes":[]},"MODELO MESA CENTRO PEBBLE":{"cod":"26155","modulacoes":["MESA CENTRO"],"colecoes":["ABIMAD - 2026"]},"MODELO MESA ZENITH":{"cod":"26156","modulacoes":["MESA JANTAR"],"colecoes":[]},"MODELO MESA QUATTRO":{"cod":"26157","modulacoes":["MESA CABECEIRA"],"colecoes":[]},"MODELO MESA PICASSO":{"cod":"26158","modulacoes":["MESA JANTAR"],"colecoes":[]},"MODELO MESA LOUISE":{"cod":"26159","modulacoes":["MESA LATERAL"],"colecoes":["ABIMAD - 2026"]},"MODELO MESA PIERRE":{"cod":"26160","modulacoes":["MESA LATERAL"],"colecoes":[]},"MODELO MESA CUORE":{"cod":"26161","modulacoes":["MESA JANTAR"],"colecoes":[]},"MODELO MESA COLONE":{"cod":"26162","modulacoes":["MESA HOME OFFICE"],"colecoes":[]},"MODELO MESA MOSER":{"cod":"26164","modulacoes":["MESA JANTAR"],"colecoes":[]},"MODELO MESA ATLAS":{"cod":"26165","modulacoes":["MESA CENTRO"],"colecoes":[]},"MODELO MESA BARDOT":{"cod":"26166","modulacoes":["MESA CENTRO"],"colecoes":["ABIMAD - 2026"]},"MODELO MESA GEM":{"cod":"26167","modulacoes":["MESA CENTRO"],"colecoes":[]},"MODELO MESA TRESSA":{"cod":"26168","modulacoes":["MESA CENTRO"],"colecoes":[]},"MODELO MESA KOVAK":{"cod":"26169","modulacoes":["MESA JANTAR"],"colecoes":["ABIMAD - 2026"]},"MODELO MESA BELGA":{"cod":"26170","modulacoes":["MESA JANTAR"],"colecoes":[]},"MODELO MESA BANSANG":{"cod":"26171","modulacoes":["MESA JANTAR"],"colecoes":["CLAMI - 2026"]},"MODELO MESA MARBELLA":{"cod":"26173","modulacoes":["MESA JANTAR"],"colecoes":[]},"MODELO MESA PALMA":{"cod":"26174","modulacoes":["MESA JANTAR"],"colecoes":[]},"MODELO MESA VOLPI":{"cod":"26175","modulacoes":["MESA JANTAR"],"colecoes":[]},"MODELO CAMA ARTTIS":{"cod":"27001","modulacoes":["CABECEIRA","CAMA","PAINEL LATERAL"],"colecoes":["ABIMAD - 2019"]},"MODELO CAMA MAUI":{"cod":"27002","modulacoes":["CABECEIRA","CAMA"],"colecoes":["PREVIEW - 2017"]},"MODELO CAMA VERNASA":{"cod":"27004","modulacoes":["CABECEIRA","CAMA"],"colecoes":["ABIMAD - 2019"]},"MODELO CAMA GORJ":{"cod":"27009","modulacoes":["CAMA"],"colecoes":["ABIMAD - 2022"]},"MODELO CAMA MEHEDINTI":{"cod":"27010","modulacoes":["CAMA"],"colecoes":["ABIMAD - 2022"]},"MODELO CAMA POMME":{"cod":"27019","modulacoes":["CAMA"],"colecoes":["PREVIEW - 2023"]},"MODELO CAMA BROA":{"cod":"27022","modulacoes":["CAMA"],"colecoes":[]},"MODELO CAMA OTOPENI":{"cod":"27023","modulacoes":["CAMA"],"colecoes":["ABIMAD - 2024"]},"MODELO CAMA CATALUNIA":{"cod":"27027","modulacoes":["CAMA"],"colecoes":["PREVIEW - 2024"]},"MODELO CAMA CELLINI":{"cod":"27028","modulacoes":["CAMA"],"colecoes":["PREVIEW - 2024"]},"MODELO CAMA VENUS":{"cod":"27030","modulacoes":["CAMA"],"colecoes":[]},"MODELO CAMA EPURE":{"cod":"27039","modulacoes":["BOX","CABECEIRA","CAMA"],"colecoes":["ABIMAD - 2025"]},"MODELO CAMA ETHER":{"cod":"27043","modulacoes":["CAMA"],"colecoes":["ABIMAD - 2026"]},"MODELO CAMA GRACE":{"cod":"27044","modulacoes":["CAMA"],"colecoes":["ABIMAD - 2026"]},"MODELO MIDI":{"cod":"28002","modulacoes":["CADEIRA"],"colecoes":[]},"MODELO EZIO":{"cod":"28003","modulacoes":["CADEIRA"],"colecoes":[]},"MODELO SAN PIETRO":{"cod":"28005","modulacoes":["CADEIRA"],"colecoes":["ABIMAD - 2024"]},"MODELO CADEIRA SUBLIME":{"cod":"28006","modulacoes":["CADEIRA"],"colecoes":["ABIMAD - 2024"]},"MODELO DEL FIORE":{"cod":"28010","modulacoes":["CADEIRA"],"colecoes":["ABIMAD - 2024"]},"MODELO SLIM":{"cod":"28012","modulacoes":["BANQUETA","CADEIRA"],"colecoes":[]},"MODELO PAISIBLE":{"cod":"28013","modulacoes":["CADEIRA"],"colecoes":["PREVIEW - 2024"]},"MODELO ECLAT":{"cod":"28015","modulacoes":["CADEIRA"],"colecoes":["PREVIEW - 2024"]},"MODELO DESIREE":{"cod":"28016","modulacoes":["CADEIRA"],"colecoes":["PREVIEW - 2024"]},"MODELO FLECHEIRA":{"cod":"28017","modulacoes":["CADEIRA"],"colecoes":[]},"MODELO GIORNATTA OFFICE":{"cod":"28018","modulacoes":["CADEIRA"],"colecoes":["ABIMAD - 2025"]},"MODELO SILLAGE":{"cod":"28019","modulacoes":["CADEIRA"],"colecoes":["ABIMAD - 2025"]},"MODELO EILEEN":{"cod":"28021","modulacoes":["CADEIRA"],"colecoes":["PREVIEW - 2025"]},"MODELO FEVER":{"cod":"28024","modulacoes":["CADEIRA"],"colecoes":["PREVIEW - 2025"]},"MODELO GIORNATTA CORPORTAIVO":{"cod":"28027","modulacoes":["CADEIRA"],"colecoes":[]},"MODELO BIOMBO ESQUEL":{"cod":"29003","modulacoes":["BIOMBO"],"colecoes":["PREVIEW - 2019"]},"MODELO BIOMBO TULUA":{"cod":"29004","modulacoes":["BIOMBO"],"colecoes":["PREVIEW - 2019"]},"MODELO ESTANTE SAN CARLOS F.L":{"cod":"30001","modulacoes":["CODIGO INATIVO","ESTANTE"],"colecoes":["ABIMAD - 2020"]},"MODELO ESTANTE SAN CRISTOBAL F.L":{"cod":"30002","modulacoes":["CODIGO INATIVO","ESTANTE"],"colecoes":["PREVIEW - 2019"]},"MODELO ESTANTE KIT SAN CARLOS":{"cod":"30003","modulacoes":["CODIGO INATIVO","ESTANTE"],"colecoes":["ABIMAD - 2020"]},"MODELO ESTANTE KIT SAN CRISTOBAL":{"cod":"30004","modulacoes":["CODIGO INATIVO","ESTANTE"],"colecoes":["PREVIEW - 2019"]},"MODELO ESTANTE SAN CRISTOBAL":{"cod":"30005","modulacoes":["ESTANTE"],"colecoes":["PREVIEW - 2019"]},"MODELO ESTANTE  SAN CARLOS":{"cod":"30006","modulacoes":["ESTANTE"],"colecoes":["ABIMAD - 2020"]},"MODELO APARADOR COMPOSTELA":{"cod":"31002","modulacoes":["APARADOR"],"colecoes":["ABIMAD - 2020"]},"MODELO APARADOR MULTIFUNCIONAL":{"cod":"31003","modulacoes":["APARADOR"],"colecoes":["ABIMAD - 2019"]},"MODELO BANDEJA NOTEBOOK":{"cod":"31005","modulacoes":["BANDEJA NOTEBOOK"],"colecoes":[]},"MODELO APARADOR BRAMANTE":{"cod":"31006","modulacoes":["APARADOR"],"colecoes":["ABIMAD - 2024"]},"MODELO APARADOR EDGE":{"cod":"31007","modulacoes":["APARADOR"],"colecoes":[]},"MODELO APARADOR SIENNA":{"cod":"31009","modulacoes":["APARADOR"],"colecoes":[]},"MODELO APARADOR TAIJIN":{"cod":"31010","modulacoes":["APARADOR"],"colecoes":[]},"MODELO BUFFET AGRA":{"cod":"32001","modulacoes":["BUFFET"],"colecoes":[]},"MODELO BUFFET SPLENDEUR":{"cod":"32003","modulacoes":["BUFFET"],"colecoes":["PREVIEW - 2024"]},"MODELO BUFFET CHERI":{"cod":"32004","modulacoes":["BUFFET"],"colecoes":[]},"MODELO BUFFET AERIS":{"cod":"32006","modulacoes":["BUFFET"],"colecoes":[]},"MODELO BUFFET ROUND":{"cod":"32007","modulacoes":["BAR","BUFFET"],"colecoes":[]},"MODELO BUFFET YOKO":{"cod":"32008","modulacoes":["BUFFET"],"colecoes":[]},"MODELO SOMA":{"cod":"32009","modulacoes":["BAR","BUFFET","GAVETEIRO","NICHO"],"colecoes":[]},"MODELO BUFFET PARMA":{"cod":"32010","modulacoes":["BUFFET"],"colecoes":[]},"MODELO BUFFET HIMALAYA":{"cod":"32011","modulacoes":["BUFFET"],"colecoes":[]},"MODELO BUFFET BRIDGE":{"cod":"32012","modulacoes":["BUFFET"],"colecoes":["ABIMAD - 2026"]},"MODELO BUFFET MANTOVA":{"cod":"32013","modulacoes":["BAR","BUFFET"],"colecoes":["ABIMAD - 2026"]},"MODELO RACK NILOP":{"cod":"33001","modulacoes":["RACK"],"colecoes":[]},"MODELO RACK JOPLIN":{"cod":"33002","modulacoes":["RACK"],"colecoes":[]},"MODELO RACK MARY":{"cod":"33003","modulacoes":["RACK"],"colecoes":[]},"MODELO ESPELHO AVANT":{"cod":"36001","modulacoes":["ESPELHO"],"colecoes":["ABIMAD - 2026"]},"MODELO ESPELHO ETTORE":{"cod":"36002","modulacoes":["ESPELHO"],"colecoes":["ABIMAD - 2026"]},"MODELO SAMMY":{"cod":"36003","modulacoes":["ESPELHO","MANCEBO"],"colecoes":["PREVIEW - 2025"]},"MODELO ESPELHO AMARNA":{"cod":"36004","modulacoes":["ESPELHO"],"colecoes":["ABIMAD - 2026"]},"MODELO ESPELHO VOLTIGE":{"cod":"36005","modulacoes":["ESPELHO"],"colecoes":[]},"MODELO MESA COMODA TURIN":{"cod":"37000","modulacoes":["COMODA"],"colecoes":["ABIMAD - 2026"]}};
+const produtos = Object.keys(DB).sort();
+let selectedProduto = null;
+let selectedModulacao = null;
+let records = [];
+let horaInicio = null;
+
+// ── INIT ──
+document.getElementById('inp-data').value = new Date().toISOString().split('T')[0];
+setHoraInicio();
+window.addEventListener('click', e => {
+  if (!e.target.closest('.search-wrap')) closeAllDropdowns();
+});
+
+function setHoraInicio() {
+  horaInicio = new Date().toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit'});
+}
+
+function maskHora(el) {
+  let v = el.value.replace(/\D/g,'');
+  if (v.length >= 3) v = v.slice(0,2) + ':' + v.slice(2,4);
+  el.value = v;
+}
+
+// ── TABS ──
+function switchTab(t, btn) {
+  document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('tab-form').style.display = t==='form' ? 'block' : 'none';
+  document.getElementById('tab-records').style.display = t==='records' ? 'block' : 'none';
+}
+
+// ── DROPDOWN SEARCH ──
+function openDropdown(id) {
+  if (id === 'dd-produto') {
+    renderProdutosDropdown(document.getElementById('inp-produto').value);
+    document.getElementById('dd-produto').classList.add('open');
+  } else if (id === 'dd-modulacao' && selectedProduto) {
+    renderModulacoesDropdown(document.getElementById('inp-modulacao').value);
+    document.getElementById('dd-modulacao').classList.add('open');
+  }
+}
+
+function closeAllDropdowns() {
+  document.querySelectorAll('.dropdown').forEach(d => d.classList.remove('open'));
+}
+
+function renderProdutosDropdown(q) {
+  const dd = document.getElementById('dd-produto');
+  const filtered = q.length < 1
+    ? produtos.slice(0, 80)
+    : produtos.filter(p => p.includes(q.toUpperCase()) || DB[p].cod.includes(q));
+  if (!filtered.length) {
+    dd.innerHTML = '<div class="dd-empty">Nenhum modelo encontrado</div>';
+    return;
+  }
+  dd.innerHTML = filtered.map(p => `
+    <div class="dd-item" onclick="selectProduto('${p}')">
+      <span>${p.replace('MODELO ','').replace('MODELO ','').split(' ').map(w=>w[0]+w.slice(1).toLowerCase()).join(' ')}</span>
+      <span class="dd-sub">${DB[p].cod}</span>
+    </div>
+  `).join('');
+}
+
+function filterProdutos(q) {
+  renderProdutosDropdown(q.toUpperCase());
+  document.getElementById('dd-produto').classList.add('open');
+}
+
+function selectProduto(nome) {
+  selectedProduto = nome;
+  selectedModulacao = null;
+  const label = nome.replace('MODELO ','').split(' ').map(w=>w[0]+w.slice(1).toLowerCase()).join(' ');
+  document.getElementById('inp-produto').value = '';
+  document.getElementById('inp-produto').placeholder = label + ' (' + DB[nome].cod + ')';
+  document.getElementById('sel-produto-text').innerHTML = label + '<span class="cod-badge">' + DB[nome].cod + '</span>';
+  document.getElementById('sel-produto-display').style.display = 'block';
+  const cols = DB[nome].colecoes;
+  const hint = document.getElementById('hint-produto');
+  if (cols.length) {
+    hint.textContent = 'Coleção: ' + cols.join(', ');
+    hint.classList.add('show');
+  } else hint.classList.remove('show');
+  const inpMod = document.getElementById('inp-modulacao');
+  inpMod.disabled = false;
+  inpMod.placeholder = 'Buscar modulação...';
+  inpMod.value = '';
+  document.getElementById('sel-modulacao-display').style.display = 'none';
+  closeAllDropdowns();
+}
+
+function clearProduto() {
+  selectedProduto = null;
+  selectedModulacao = null;
+  document.getElementById('inp-produto').value = '';
+  document.getElementById('inp-produto').placeholder = 'Digite o nome ou código do modelo...';
+  document.getElementById('sel-produto-display').style.display = 'none';
+  document.getElementById('hint-produto').classList.remove('show');
+  const inpMod = document.getElementById('inp-modulacao');
+  inpMod.disabled = true;
+  inpMod.placeholder = 'Selecione o modelo primeiro...';
+  inpMod.value = '';
+  document.getElementById('sel-modulacao-display').style.display = 'none';
+}
+
+function renderModulacoesDropdown(q) {
+  if (!selectedProduto) return;
+  const dd = document.getElementById('dd-modulacao');
+  const mods = DB[selectedProduto].modulacoes;
+  const filtered = q.length < 1 ? mods : mods.filter(m => m.toUpperCase().includes(q.toUpperCase()));
+  if (!filtered.length) {
+    dd.innerHTML = '<div class="dd-empty">Nenhuma modulação encontrada</div>';
+    return;
+  }
+  dd.innerHTML = filtered.map(m => `
+    <div class="dd-item" onclick="selectModulacao('${m.replace(/'/g, "\'")}')">
+      <span>${m}</span>
+    </div>
+  `).join('');
+}
+
+function filterModulacoes(q) {
+  if (!selectedProduto) return;
+  renderModulacoesDropdown(q);
+  document.getElementById('dd-modulacao').classList.add('open');
+}
+
+function selectModulacao(nome) {
+  selectedModulacao = nome;
+  document.getElementById('inp-modulacao').value = '';
+  document.getElementById('inp-modulacao').placeholder = nome;
+  document.getElementById('sel-modulacao-text').textContent = nome;
+  document.getElementById('sel-modulacao-display').style.display = 'block';
+  closeAllDropdowns();
+}
+
+function clearModulacao() {
+  selectedModulacao = null;
+  document.getElementById('inp-modulacao').value = '';
+  document.getElementById('inp-modulacao').placeholder = 'Buscar modulação...';
+  document.getElementById('sel-modulacao-display').style.display = 'none';
+}
+
+// ── CHIPS ──
+function selectChip(el, group) {
+  document.querySelectorAll('#' + group + ' .chip').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+function getChip(group) {
+  const sel = document.querySelector('#' + group + ' .chip.selected');
+  return sel ? sel.dataset.val : '';
+}
+
+// ── NAVIGATION ──
+function setProgress(step) {
+  [1,2,3].forEach(i => {
+    const el = document.getElementById('p' + i);
+    el.className = 'prog-step' + (i < step ? ' done' : i === step ? ' active' : '');
+  });
+}
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function goTo1() { showScreen('sc1'); setProgress(1); }
+
+function goTo2() {
+  if (!selectedProduto) return showNotify('Selecione um modelo.', 'error');
+  if (!selectedModulacao) return showNotify('Selecione uma modulação.', 'error');
+  showScreen('sc2'); setProgress(2);
+  if (!document.getElementById('inp-hora-fim').value) {
+    const now = new Date();
+    document.getElementById('inp-hora-fim').value = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
+  }
+}
+
+function goTo3() {
+  const setor = getChip('chip-setor');
+  const versao = document.getElementById('sel-versao').value;
+  const desc = document.getElementById('inp-descricao').value.trim();
+  const data = document.getElementById('inp-data').value;
+  const horaFim = document.getElementById('inp-hora-fim').value;
+  if (!setor) return showNotify('Selecione o setor.', 'error');
+  if (!versao) return showNotify('Selecione a versão.', 'error');
+  if (!desc) return showNotify('Preencha a descrição.', 'error');
+  if (!data) return showNotify('Informe a data.', 'error');
+  if (!horaFim) return showNotify('Informe a hora de conclusão.', 'error');
+
+  const label = selectedProduto.replace('MODELO ','').split(' ').map(w=>w[0]+w.slice(1).toLowerCase()).join(' ');
+  const melhoria = document.getElementById('sel-melhoria').value || 'Nenhuma';
+  const rows = [
+    ['Modelo', label + ' (' + DB[selectedProduto].cod + ')'],
+    ['Modulação', selectedModulacao],
+    ['Setor', setor],
+    ['Versão', versao],
+    ['Tipo de Melhoria', melhoria],
+    ['Data', data],
+    ['Hora Início', horaInicio],
+    ['Hora Conclusão', horaFim],
+    ['Descrição', desc],
+  ];
+  document.getElementById('summary-card').innerHTML = rows.map(([k,v]) =>
+    `<div class="summary-row"><div class="sk">${k}</div><div class="sv">${v}</div></div>`
+  ).join('');
+  showScreen('sc3'); setProgress(3);
+}
+
+function submitForm() {
+  const rec = {
+    id: records.length + 1,
+    modelo: selectedProduto,
+    cod: DB[selectedProduto].cod,
+    modulacao: selectedModulacao,
+    setor: getChip('chip-setor'),
+    versao: document.getElementById('sel-versao').value,
+    melhoria: document.getElementById('sel-melhoria').value || 'Nenhuma',
+    data: document.getElementById('inp-data').value,
+    hora_inicio: horaInicio,
+    hora_conclusao: document.getElementById('inp-hora-fim').value,
+    descricao: document.getElementById('inp-descricao').value.trim(),
+    salvo_em: new Date().toLocaleString('pt-BR')
+  };
+  records.push(rec);
+  document.getElementById('rec-count').textContent = records.length;
+  renderRecords();
+  showScreen('scOK');
+  setProgress(3);
+}
+
+function newForm() {
+  clearProduto();
+  document.querySelectorAll('.chip.selected').forEach(c => c.classList.remove('selected'));
+  document.getElementById('sel-versao').value = '';
+  document.getElementById('sel-melhoria').value = '';
+  document.getElementById('inp-descricao').value = '';
+  document.getElementById('inp-hora-fim').value = '';
+  document.getElementById('inp-data').value = new Date().toISOString().split('T')[0];
+  setHoraInicio();
+  goTo1();
+}
+
+function renderRecords() {
+  const list = document.getElementById('records-list');
+  const sub = document.getElementById('rec-subtitle');
+  if (!records.length) { list.innerHTML=''; sub.textContent='Nenhum registro ainda.'; return; }
+  sub.textContent = records.length + ' registro(s) nesta sessão.';
+  list.innerHTML = records.slice().reverse().map(r => `
+    <div class="rec-item">
+      <div>
+        <div class="rec-main">${r.modelo.replace('MODELO ','').split(' ').map(w=>w[0]+w.slice(1).toLowerCase()).join(' ')} — ${r.modulacao}</div>
+        <div class="rec-sub">Setor: ${r.setor} | ${r.versao} | ${r.melhoria}</div>
+      </div>
+      <div class="rec-time">${r.data}<br>${r.hora_inicio} → ${r.hora_conclusao}</div>
+    </div>
+  `).join('');
+}
+
+function exportCSV() {
+  if (!records.length) return showNotify('Nenhum registro para exportar.', 'error');
+  const heads = ['ID','Código','Modelo','Modulação','Setor','Versão','Tipo Melhoria','Data','Hora Início','Hora Conclusão','Descrição','Salvo em'];
+  const rows = records.map(r => [
+    r.id, r.cod, r.modelo, r.modulacao, r.setor, r.versao, r.melhoria,
+    r.data, r.hora_inicio, r.hora_conclusao,
+    '"' + r.descricao.replace(/"/g,'""') + '"',
+    r.salvo_em
+  ].join(','));
+  const csv = [heads.join(','), ...rows].join('\n');
+  const blob = new Blob(['\uFEFF' + csv], {type:'text/csv;charset=utf-8'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'registros_producao_' + new Date().toISOString().slice(0,10) + '.csv';
+  a.click();
+  showNotify('CSV exportado com sucesso!', 'success');
+}
+
+function showNotify(msg, type) {
+  const el = document.getElementById('notify');
+  el.textContent = msg;
+  el.className = 'notify ' + type;
+  el.style.display = 'block';
+  setTimeout(() => el.style.display = 'none', 3000);
+}
+
+// Init dropdown
+renderProdutosDropdown('');
+</script>
+</body>
+</html>
