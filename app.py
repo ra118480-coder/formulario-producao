@@ -2,7 +2,6 @@ from flask import Flask, render_template, jsonify, request
 import pandas as pd
 import sqlite3
 import os
-import requests
 
 app = Flask(__name__)
 
@@ -10,7 +9,7 @@ ARQUIVO_EXCEL = "registros.xlsx"
 
 
 # =========================
-# BANCO
+# SQLITE (CASCATA)
 # =========================
 def conectar():
     conn = sqlite3.connect("produtos.db")
@@ -69,7 +68,7 @@ def modulacoes(feira, produto):
 
 
 # =========================
-# SALVAR (MULTI FOTOS + MULTI DESCRIÇÕES)
+# SALVAR (MULTI DADOS + EXCEL HISTÓRICO)
 # =========================
 @app.route("/api/salvar", methods=["POST"])
 def salvar():
@@ -78,29 +77,29 @@ def salvar():
     files = request.files
 
     # =========================
-    # PEGA MÚLTIPLAS DESCRIÇÕES
+    # DESCRIÇÕES MÚLTIPLAS
     # =========================
     descricoes = []
-    fotos = []
-
     i = 1
     while f"descricao_{i}" in form:
-        descricoes.append(form.get(f"descricao_{i}"))
+        if form.get(f"descricao_{i}"):
+            descricoes.append(form.get(f"descricao_{i}"))
         i += 1
 
     # =========================
-    # PEGA MÚLTIPLAS FOTOS
+    # FOTOS MÚLTIPLAS
     # =========================
+    fotos = []
     j = 1
     while f"foto_{j}" in files:
         file = files.get(f"foto_{j}")
-
         if file:
-            fotos.append(file.filename)  # aqui depois pode subir SharePoint
-
+            fotos.append(file.filename)  # depois conecta SharePoint
         j += 1
 
-
+    # =========================
+    # REGISTRO FINAL
+    # =========================
     nova_linha = {
         "feira": form.get("feira"),
         "produto": form.get("produto"),
@@ -114,7 +113,7 @@ def salvar():
     }
 
     # =========================
-    # SALVA SEMPRE ACUMULANDO
+    # SALVAR SEM PERDER HISTÓRICO
     # =========================
     if os.path.exists(ARQUIVO_EXCEL):
         df = pd.read_excel(ARQUIVO_EXCEL)
@@ -127,5 +126,8 @@ def salvar():
     return jsonify({"status": "ok"})
 
 
+# =========================
+# RUN
+# =========================
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=10000)
