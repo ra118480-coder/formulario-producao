@@ -3,60 +3,159 @@
 
 <head>
 <meta charset="UTF-8">
-<title>Formulário Industrial</title>
+<title>Formulário de Produção</title>
+
+<style>
+
+body {
+    font-family: Arial, sans-serif;
+    background: #f4f6f9;
+    margin: 0;
+    padding: 30px;
+}
+
+.container {
+    max-width: 800px;
+    margin: auto;
+    background: white;
+    padding: 25px;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+h2 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+label {
+    font-weight: bold;
+    display: block;
+    margin-top: 15px;
+}
+
+select, input, textarea {
+    width: 100%;
+    padding: 10px;
+    margin-top: 5px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+}
+
+textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+button {
+    margin-top: 15px;
+    width: 100%;
+    padding: 12px;
+    background: #007bff;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #0056b3;
+}
+
+.section {
+    margin-bottom: 20px;
+    padding: 15px;
+    background: #fafafa;
+    border-radius: 8px;
+    border: 1px solid #eee;
+}
+
+.small-btn {
+    width: auto;
+    background: #28a745;
+    margin-top: 10px;
+}
+
+.small-btn:hover {
+    background: #1e7e34;
+}
+
+</style>
 </head>
 
 <body>
+
+<div class="container">
 
 <h2>Formulário de Produção</h2>
 
 <form id="formulario">
 
 <!-- FEIRA -->
+<div class="section">
+<label>Feira</label>
 <select name="feira" id="feira"></select>
+</div>
 
 <!-- PRODUTO -->
+<div class="section">
+<label>Produto</label>
 <select name="produto" id="produto"></select>
+</div>
 
 <!-- MODULAÇÃO -->
+<div class="section">
+<label>Modulação</label>
 <select name="modulacao" id="modulacao"></select>
+</div>
 
 <!-- FASE -->
+<div class="section">
+<label>Fase</label>
 <select name="fase">
-  <option>Montagem</option>
-  <option>Espumação</option>
-  <option>Tapeçaria</option>
+<option>Montagem</option>
+<option>Espumação</option>
+<option>Tapeçaria</option>
 </select>
+</div>
 
 <!-- TIPO -->
+<div class="section">
+<label>Tipo</label>
 <select name="melhoria">
-  <option>Informacional</option>
-  <option>Melhoria</option>
+<option>Informacional</option>
+<option>Melhoria</option>
 </select>
-
-<hr>
+</div>
 
 <!-- DESCRIÇÕES MÚLTIPLAS -->
+<div class="section">
+<label>Descrições</label>
+
 <div id="descricoes">
-  <input name="descricao_1" placeholder="Descrição 1">
+<input name="descricao_1" placeholder="Descrição 1">
 </div>
 
-<button type="button" onclick="addDescricao()">+ adicionar descrição</button>
-
-<hr>
+<button type="button" class="small-btn" onclick="addDescricao()">+ adicionar descrição</button>
+</div>
 
 <!-- FOTOS MÚLTIPLAS -->
+<div class="section">
+<label>Fotos</label>
+
 <div id="fotos">
-  <input type="file" name="foto_1">
+<input type="file" name="foto_1">
 </div>
 
-<button type="button" onclick="addFoto()">+ adicionar foto</button>
+<button type="button" class="small-btn" onclick="addFoto()">+ adicionar foto</button>
+</div>
 
-<hr>
-
+<!-- SUBMIT -->
 <button type="submit">Salvar</button>
 
 </form>
+
+</div>
 
 <script src="/static/script.js"></script>
 
