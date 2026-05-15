@@ -4,111 +4,61 @@
 <head>
 <meta charset="UTF-8">
 <title>Formulário</title>
-<style>
-
-body { font-family: Arial; background:#f4f4f4; padding:30px; }
-
-.container {
-    max-width: 800px;
-    margin:auto;
-    background:white;
-    padding:20px;
-    border-radius:10px;
-}
-
-select, input, textarea {
-    width:100%;
-    padding:10px;
-    margin-top:5px;
-}
-
-.campo { margin-bottom:15px; }
-
-button {
-    width:100%;
-    padding:12px;
-    background:blue;
-    color:white;
-    border:none;
-}
-
-</style>
 </head>
 
 <body>
 
-<div class="container">
+<h2>Formulário</h2>
 
-<h2>Formulário de Modulações</h2>
-
-<form id="formulario" enctype="multipart/form-data">
+<form id="formulario">
 
 <!-- FEIRA -->
-<div class="campo">
-<label>Feira</label>
-<select id="modelo" name="feira"></select>
-</div>
+<select name="feira" id="feira"></select>
 
 <!-- PRODUTO -->
-<div class="campo">
-<label>Produto</label>
-<select id="modulacao" name="produto"></select>
-</div>
+<select name="produto" id="produto"></select>
 
 <!-- MODULAÇÃO -->
-<div class="campo">
-<label>Modulação</label>
-<select id="variavel" name="modulacao"></select>
-</div>
+<select name="modulacao" id="modulacao"></select>
 
-<!-- SETOR -->
-<div class="campo">
-<label>Setor</label>
-<select name="setor">
-<option>Madeira</option>
-<option>Espuma</option>
-<option>Tecido</option>
+<!-- FASE -->
+<select name="fase">
+  <option>Montagem</option>
+  <option>Espumação</option>
+  <option>Tapeçaria</option>
 </select>
-</div>
-
-<!-- CLASSIFICAÇÃO -->
-<div class="campo">
-<label>Classificação</label>
-<select name="classificacao">
-<option>Produto em linha</option>
-<option>Validação</option>
-</select>
-</div>
 
 <!-- TIPO -->
-<div class="campo">
-<label>Tipo</label>
 <select name="melhoria">
-<option>Informacional</option>
-<option>Melhoria</option>
+  <option>Informacional</option>
+  <option>Melhoria</option>
 </select>
+
+<hr>
+
+<!-- DESCRIÇÕES MULTIPLAS -->
+<div id="descricoes">
+  <input name="descricao_1" placeholder="Descrição 1">
 </div>
 
-<!-- DESCRIÇÃO -->
-<div class="campo">
-<label>Descrição</label>
-<textarea name="descricao"></textarea>
+<button type="button" onclick="addDescricao()">+ descrição</button>
+
+<hr>
+
+<!-- FOTOS MULTIPLAS -->
+<div id="fotos">
+  <input type="file" name="foto_1">
 </div>
 
-<!-- FOTO -->
-<div class="campo">
-<label>Imagem</label>
-<input type="file" name="imagem">
-</div>
+<button type="button" onclick="addFoto()">+ foto</button>
+
+<hr>
 
 <button type="submit">Salvar</button>
 
 </form>
 
-</div>
-
 <script src="/static/script.js"></script>
 
 </body>
-
 </html>
