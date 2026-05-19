@@ -5,12 +5,15 @@ from openpyxl import load_workbook
 
 app = Flask(__name__)
 
+# =========================
+# ARQUIVO EXCEL BASE
+# =========================
+
 arquivo = "Produtos_modulacoes_colecao (2).xlsx"
 
-# LER EXCEL
 df = pd.read_excel(arquivo)
 
-# PADRONIZAR COLUNAS
+# PADRONIZAR NOMES DAS COLUNAS
 df.columns = df.columns.str.strip().str.lower()
 
 # PADRONIZAR DADOS
@@ -19,11 +22,18 @@ df["desc_tecnica"] = df["desc_tecnica"].astype(str).str.strip()
 df["caracteristica"] = df["caracteristica"].astype(str).str.strip()
 df["variavel"] = df["variavel"].astype(str).str.strip()
 
+# =========================
+# HOME
+# =========================
+
 @app.route("/")
 def home():
     return render_template("index.html")
 
+# =========================
 # FEIRAS
+# =========================
+
 @app.route("/feiras")
 def feiras():
 
@@ -33,7 +43,10 @@ def feiras():
 
     return jsonify(feiras)
 
+# =========================
 # PRODUTOS
+# =========================
+
 @app.route("/produtos/<feira>")
 def produtos(feira):
 
@@ -47,7 +60,10 @@ def produtos(feira):
 
     return jsonify(produtos)
 
+# =========================
 # MODULAÇÕES
+# =========================
+
 @app.route("/modulacoes/<produto>")
 def modulacoes(produto):
 
@@ -57,15 +73,19 @@ def modulacoes(produto):
         df["desc_tecnica"] == produto
     ]
 
+    # AQUI ESTÁ A CORREÇÃO
     modulacoes = filtrado[
-        "caracteristica"
+        "variavel"
     ].dropna().unique().tolist()
 
     modulacoes = sorted(modulacoes)
 
     return jsonify(modulacoes)
 
-# SALVAR
+# =========================
+# SALVAR FORMULÁRIO
+# =========================
+
 @app.route("/salvar", methods=["POST"])
 def salvar():
 
@@ -74,56 +94,60 @@ def salvar():
     modulacao = request.form.get("modulacao")
     versao = request.form.get("versao")
     fase = request.form.get("fase")
-    melhoria = request.form.get("melhoria")
+    tipo = request.form.get("tipo")
 
     dados = {
         "Feira": feira,
         "Produto": produto,
-        "Modulação": modulacao,
-        "Versão": versao,
+        "Modulacao": modulacao,
+        "Versao": versao,
         "Fase": fase,
-        "Tipo": melhoria
+        "Tipo": tipo
     }
 
-    i = 1
+    contador = 1
 
     while True:
 
-        descricao = request.form.get(f"descricao_{i}")
+        descricao = request.form.get(f"descricao_{contador}")
 
         if descricao is None:
             break
 
-        dados[f"Descricao_{i}"] = descricao
+        dados[f"Descricao_{contador}"] = descricao
 
-        foto = request.files.get(f"foto_{i}")
+        foto = request.files.get(f"foto_{contador}")
 
         if foto and foto.filename != "":
 
-            pasta = "static/uploads"
+            pasta_upload = "static/uploads"
 
-            os.makedirs(pasta, exist_ok=True)
+            os.makedirs(pasta_upload, exist_ok=True)
 
             caminho = os.path.join(
-                pasta,
+                pasta_upload,
                 foto.filename
             )
 
             foto.save(caminho)
 
-            dados[f"Foto_{i}"] = caminho
+            dados[f"Foto_{contador}"] = caminho
 
         else:
 
-            dados[f"Foto_{i}"] = ""
+            dados[f"Foto_{contador}"] = ""
 
-        i += 1
+        contador += 1
+
+    # =========================
+    # EXCEL FINAL
+    # =========================
 
     arquivo_excel = "registros.xlsx"
 
     novo_df = pd.DataFrame([dados])
 
-    # ADICIONAR SEM APAGAR ANTIGOS
+    # SE JÁ EXISTIR -> ADICIONA
     if os.path.exists(arquivo_excel):
 
         book = load_workbook(arquivo_excel)
@@ -150,6 +174,7 @@ def salvar():
 
         writer.close()
 
+    # SE NÃO EXISTIR -> CRIA
     else:
 
         novo_df.to_excel(
@@ -157,9 +182,14 @@ def salvar():
             index=False
         )
 
-    return "Salvo com sucesso!"
+    return "Formulário salvo com sucesso!"
+
+# =========================
+# RODAR
+# =========================
 
 if __name__ == "__main__":
+
     app.run(
         host="0.0.0.0",
         port=10000
