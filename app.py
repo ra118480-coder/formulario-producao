@@ -7,9 +7,17 @@ app = Flask(__name__)
 
 arquivo = "Produtos_modulacoes_colecao (2).xlsx"
 
+# LER EXCEL
 df = pd.read_excel(arquivo)
 
+# PADRONIZAR COLUNAS
 df.columns = df.columns.str.strip().str.lower()
+
+# PADRONIZAR DADOS
+df["colecao"] = df["colecao"].astype(str).str.strip()
+df["desc_tecnica"] = df["desc_tecnica"].astype(str).str.strip()
+df["caracteristica"] = df["caracteristica"].astype(str).str.strip()
+df["variavel"] = df["variavel"].astype(str).str.strip()
 
 @app.route("/")
 def home():
@@ -29,6 +37,8 @@ def feiras():
 @app.route("/produtos/<feira>")
 def produtos(feira):
 
+    feira = feira.strip()
+
     produtos = df[
         df["colecao"] == feira
     ]["desc_tecnica"].dropna().unique().tolist()
@@ -41,9 +51,15 @@ def produtos(feira):
 @app.route("/modulacoes/<produto>")
 def modulacoes(produto):
 
-    modulacoes = df[
+    produto = produto.strip()
+
+    filtrado = df[
         df["desc_tecnica"] == produto
-    ]["caracteristica"].dropna().unique().tolist()
+    ]
+
+    modulacoes = filtrado[
+        "caracteristica"
+    ].dropna().unique().tolist()
 
     modulacoes = sorted(modulacoes)
 
@@ -88,7 +104,10 @@ def salvar():
 
             os.makedirs(pasta, exist_ok=True)
 
-            caminho = os.path.join(pasta, foto.filename)
+            caminho = os.path.join(
+                pasta,
+                foto.filename
+            )
 
             foto.save(caminho)
 
@@ -104,6 +123,7 @@ def salvar():
 
     novo_df = pd.DataFrame([dados])
 
+    # ADICIONAR SEM APAGAR ANTIGOS
     if os.path.exists(arquivo_excel):
 
         book = load_workbook(arquivo_excel)
@@ -140,4 +160,7 @@ def salvar():
     return "Salvo com sucesso!"
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=10000)
+    app.run(
+        host="0.0.0.0",
+        port=10000
+    )
