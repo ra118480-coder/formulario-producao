@@ -18,32 +18,36 @@ def home():
 # FEIRAS
 @app.route("/feiras")
 def feiras():
-    feiras = sorted(df["colecao"].dropna().unique().tolist())
+
+    feiras = sorted(
+        df["colecao"].dropna().unique().tolist()
+    )
+
     return jsonify(feiras)
 
 # PRODUTOS
 @app.route("/produtos/<feira>")
 def produtos(feira):
-    produtos = df[df["colecao"] == feira]["desc_tecnica"].dropna().unique().tolist()
+
+    produtos = df[
+        df["colecao"] == feira
+    ]["desc_tecnica"].dropna().unique().tolist()
+
     produtos = sorted(produtos)
+
     return jsonify(produtos)
 
 # MODULAÇÕES
 @app.route("/modulacoes/<produto>")
 def modulacoes(produto):
-    modulacoes = df[df["desc_tecnica"] == produto]["caracteristica"].dropna().unique().tolist()
+
+    modulacoes = df[
+        df["desc_tecnica"] == produto
+    ]["caracteristica"].dropna().unique().tolist()
+
     modulacoes = sorted(modulacoes)
+
     return jsonify(modulacoes)
-
-# VERSÕES
-@app.route("/versoes/<modulacao>")
-def versoes(modulacao):
-
-    versoes = df[df["caracteristica"] == modulacao]["variavel"].dropna().unique().tolist()
-
-    versoes = sorted(versoes)
-
-    return jsonify(versoes)
 
 # SALVAR
 @app.route("/salvar", methods=["POST"])
@@ -91,6 +95,7 @@ def salvar():
             dados[f"Foto_{i}"] = caminho
 
         else:
+
             dados[f"Foto_{i}"] = ""
 
         i += 1
@@ -127,7 +132,10 @@ def salvar():
 
     else:
 
-        novo_df.to_excel(arquivo_excel, index=False)
+        novo_df.to_excel(
+            arquivo_excel,
+            index=False
+        )
 
     return "Salvo com sucesso!"
 
