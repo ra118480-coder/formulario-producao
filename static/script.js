@@ -1,113 +1,142 @@
+let contador = 0;
 
-let descCount = 1
-let fotoCount = 1
+async function carregarFeiras() {
 
+    let response = await fetch("/feiras");
 
-// =========================
-// CASCATA
-// =========================
-async function loadFeiras() {
+    let feiras = await response.json();
 
-const res = await fetch("/api/feiras")
-const data = await res.json()
+    let feiraSelect = document.getElementById("feira");
 
-const feira = document.getElementById("feira")
+    feiraSelect.innerHTML = "";
 
-feira.innerHTML = "<option>Selecione</option>"
+    feiras.forEach(feira => {
 
-data.forEach(i => {
-feira.innerHTML += `<option>${i}</option>`
-})
+        feiraSelect.innerHTML += `
+            <option value="${feira}">${feira}</option>
+        `;
+
+    });
+
+    carregarProdutos();
+}
+
+async function carregarProdutos() {
+
+    let feira = document.getElementById("feira").value;
+
+    let response = await fetch(`/produtos/${feira}`);
+
+    let produtos = await response.json();
+
+    let produtoSelect = document.getElementById("produto");
+
+    produtoSelect.innerHTML = "";
+
+    produtos.forEach(produto => {
+
+        produtoSelect.innerHTML += `
+            <option value="${produto}">${produto}</option>
+        `;
+
+    });
+
+    carregarModulacoes();
+}
+
+async function carregarModulacoes() {
+
+    let produto = document.getElementById("produto").value;
+
+    let response = await fetch(`/modulacoes/${produto}`);
+
+    let modulacoes = await response.json();
+
+    let modulacaoSelect = document.getElementById("modulacao");
+
+    modulacaoSelect.innerHTML = "";
+
+    modulacoes.forEach(modulacao => {
+
+        modulacaoSelect.innerHTML += `
+            <option value="${modulacao}">${modulacao}</option>
+        `;
+
+    });
+
+    carregarVersoes();
+}
+
+async function carregarVersoes() {
+
+    let modulacao = document.getElementById("modulacao").value;
+
+    let response = await fetch(`/versoes/${modulacao}`);
+
+    let versoes = await response.json();
+
+    let versaoSelect = document.getElementById("versao");
+
+    versaoSelect.innerHTML = "";
+
+    versoes.forEach(versao => {
+
+        versaoSelect.innerHTML += `
+            <option value="${versao}">${versao}</option>
+        `;
+
+    });
 
 }
 
+document.getElementById("feira")
+.addEventListener("change", carregarProdutos);
 
-async function loadProdutos(feira) {
+document.getElementById("produto")
+.addEventListener("change", carregarModulacoes);
 
-const res = await fetch(`/api/produtos/${feira}`)
-const data = await res.json()
+document.getElementById("modulacao")
+.addEventListener("change", carregarVersoes);
 
-const produto = document.getElementById("produto")
+function adicionarCampo() {
 
-produto.innerHTML = "<option>Selecione</option>"
+    contador++;
 
-data.forEach(i => {
-produto.innerHTML += `<option>${i}</option>`
-})
+    let div = document.createElement("div");
 
+    div.className = "bloco";
+
+    div.innerHTML = `
+
+        <label>Descrição ${contador}</label>
+        <textarea name="descricao_${contador}"></textarea>
+
+        <label>Foto ${contador}</label>
+        <input type="file" name="foto_${contador}">
+
+    `;
+
+    document.getElementById("campos").appendChild(div);
 }
 
+adicionarCampo();
 
-async function loadModulacoes(feira, produto) {
+document.getElementById("formulario")
+.addEventListener("submit", async function(e){
 
-const res = await fetch(`/api/modulacoes/${feira}/${produto}`)
-const data = await res.json()
+    e.preventDefault();
 
-const mod = document.getElementById("modulacao")
+    let formData = new FormData(this);
 
-mod.innerHTML = "<option>Selecione</option>"
+    let response = await fetch("/salvar",{
+        method:"POST",
+        body:formData
+    });
 
-data.forEach(i => {
-mod.innerHTML += `<option>${i}</option>`
-})
+    let resultado = await response.text();
 
-}
+    alert(resultado);
 
+});
 
-// =========================
-// EVENTS CASCATA
-// =========================
-document.getElementById("feira").addEventListener("change", (e) => {
-loadProdutos(e.target.value)
-})
-
-document.getElementById("produto").addEventListener("change", (e) => {
-loadModulacoes(
-document.getElementById("feira").value,
-e.target.value
-)
-})
-
-
-// =========================
-// MULTI DESCRIÇÕES
-// =========================
-function addDescricao() {
-descCount++
-document.getElementById("descricoes").innerHTML +=
-`<input name="descricao_${descCount}" placeholder="Descrição ${descCount}">`
-}
-
-
-// =========================
-// MULTI FOTOS
-// =========================
-function addFoto() {
-fotoCount++
-document.getElementById("fotos").innerHTML +=
-`<input type="file" name="foto_${fotoCount}">`
-}
-
-
-// =========================
-// SUBMIT
-// =========================
-document.getElementById("formulario").addEventListener("submit", async (e) => {
-
-e.preventDefault()
-
-const formData = new FormData(e.target)
-
-await fetch("/api/salvar", {
-method: "POST",
-body: formData
-})
-
-alert("Salvo com sucesso!")
-
-e.target.reset()
-
-})
-
-// INIT
-loadFeiras()
+carregarFeiras();
