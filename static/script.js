@@ -64,29 +64,6 @@ async function carregarModulacoes() {
 
     });
 
-    carregarVersoes();
-}
-
-async function carregarVersoes() {
-
-    let modulacao = document.getElementById("modulacao").value;
-
-    let response = await fetch(`/versoes/${modulacao}`);
-
-    let versoes = await response.json();
-
-    let versaoSelect = document.getElementById("versao");
-
-    versaoSelect.innerHTML = "";
-
-    versoes.forEach(versao => {
-
-        versaoSelect.innerHTML += `
-            <option value="${versao}">${versao}</option>
-        `;
-
-    });
-
 }
 
 document.getElementById("feira")
@@ -94,9 +71,6 @@ document.getElementById("feira")
 
 document.getElementById("produto")
 .addEventListener("change", carregarModulacoes);
-
-document.getElementById("modulacao")
-.addEventListener("change", carregarVersoes);
 
 function adicionarCampo() {
 
