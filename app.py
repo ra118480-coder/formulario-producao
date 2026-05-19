@@ -1,133 +1,135 @@
-from flask import Flask, render_template, jsonify, request
+from flask import Flask, render_template, request, jsonify
 import pandas as pd
-import sqlite3
 import os
+from openpyxl import load_workbook
 
 app = Flask(__name__)
 
-ARQUIVO_EXCEL = "registros.xlsx"
+arquivo = "Produtos_modulacoes_colecao (2).xlsx"
 
+df = pd.read_excel(arquivo)
 
-# =========================
-# SQLITE (CASCATA)
-# =========================
-def conectar():
-    conn = sqlite3.connect("produtos.db")
-    conn.row_factory = sqlite3.Row
-    return conn
+df.columns = df.columns.str.strip().str.lower()
 
-
-# =========================
-# HOME
-# =========================
 @app.route("/")
 def home():
     return render_template("index.html")
 
-
-# =========================
 # FEIRAS
-# =========================
-@app.route("/api/feiras")
+@app.route("/feiras")
 def feiras():
-    conn = conectar()
-    dados = conn.execute("SELECT DISTINCT colecao FROM produtos").fetchall()
-    conn.close()
-    return jsonify([x[0] for x in dados])
+    feiras = sorted(df["colecao"].dropna().unique().tolist())
+    return jsonify(feiras)
 
-
-# =========================
 # PRODUTOS
-# =========================
-@app.route("/api/produtos/<feira>")
+@app.route("/produtos/<feira>")
 def produtos(feira):
-    conn = conectar()
-    dados = conn.execute("""
-        SELECT DISTINCT desc_tecnica
-        FROM produtos
-        WHERE colecao = ?
-    """, (feira,)).fetchall()
-    conn.close()
-    return jsonify([x[0] for x in dados])
+    produtos = df[df["colecao"] == feira]["desc_tecnica"].dropna().unique().tolist()
+    produtos = sorted(produtos)
+    return jsonify(produtos)
 
-
-# =========================
 # MODULAÇÕES
-# =========================
-@app.route("/api/modulacoes/<feira>/<produto>")
-def modulacoes(feira, produto):
-    conn = conectar()
-    dados = conn.execute("""
-        SELECT DISTINCT variavel
-        FROM produtos
-        WHERE colecao = ?
-        AND desc_tecnica = ?
-    """, (feira, produto)).fetchall()
-    conn.close()
-    return jsonify([x[0] for x in dados])
+@app.route("/modulacoes/<produto>")
+def modulacoes(produto):
+    modulacoes = df[df["desc_tecnica"] == produto]["caracteristica"].dropna().unique().tolist()
+    modulacoes = sorted(modulacoes)
+    return jsonify(modulacoes)
 
+# VERSÕES
+@app.route("/versoes/<modulacao>")
+def versoes(modulacao):
 
-# =========================
-# SALVAR (MULTI DADOS + EXCEL HISTÓRICO)
-# =========================
-@app.route("/api/salvar", methods=["POST"])
+    versoes = df[df["caracteristica"] == modulacao]["variavel"].dropna().unique().tolist()
+
+    versoes = sorted(versoes)
+
+    return jsonify(versoes)
+
+# SALVAR
+@app.route("/salvar", methods=["POST"])
 def salvar():
 
-    form = request.form.to_dict()
-    files = request.files
+    feira = request.form.get("feira")
+    produto = request.form.get("produto")
+    modulacao = request.form.get("modulacao")
+    versao = request.form.get("versao")
+    fase = request.form.get("fase")
+    melhoria = request.form.get("melhoria")
 
-    # =========================
-    # DESCRIÇÕES MÚLTIPLAS
-    # =========================
-    descricoes = []
-    i = 1
-    while f"descricao_{i}" in form:
-        if form.get(f"descricao_{i}"):
-            descricoes.append(form.get(f"descricao_{i}"))
-        i += 1
-
-    # =========================
-    # FOTOS MÚLTIPLAS
-    # =========================
-    fotos = []
-    j = 1
-    while f"foto_{j}" in files:
-        file = files.get(f"foto_{j}")
-        if file:
-            fotos.append(file.filename)  # depois conecta SharePoint
-        j += 1
-
-    # =========================
-    # REGISTRO FINAL
-    # =========================
-    nova_linha = {
-        "feira": form.get("feira"),
-        "produto": form.get("produto"),
-        "modulacao": form.get("modulacao"),
-
-        "fase": form.get("fase"),
-        "tipo": form.get("melhoria"),
-
-        "descricoes": " | ".join(descricoes),
-        "fotos": " | ".join(fotos)
+    dados = {
+        "Feira": feira,
+        "Produto": produto,
+        "Modulação": modulacao,
+        "Versão": versao,
+        "Fase": fase,
+        "Tipo": melhoria
     }
 
-    # =========================
-    # SALVAR SEM PERDER HISTÓRICO
-    # =========================
-    if os.path.exists(ARQUIVO_EXCEL):
-        df = pd.read_excel(ARQUIVO_EXCEL)
-        df = pd.concat([df, pd.DataFrame([nova_linha])], ignore_index=True)
+    i = 1
+
+    while True:
+
+        descricao = request.form.get(f"descricao_{i}")
+
+        if descricao is None:
+            break
+
+        dados[f"Descricao_{i}"] = descricao
+
+        foto = request.files.get(f"foto_{i}")
+
+        if foto and foto.filename != "":
+
+            pasta = "static/uploads"
+
+            os.makedirs(pasta, exist_ok=True)
+
+            caminho = os.path.join(pasta, foto.filename)
+
+            foto.save(caminho)
+
+            dados[f"Foto_{i}"] = caminho
+
+        else:
+            dados[f"Foto_{i}"] = ""
+
+        i += 1
+
+    arquivo_excel = "registros.xlsx"
+
+    novo_df = pd.DataFrame([dados])
+
+    if os.path.exists(arquivo_excel):
+
+        book = load_workbook(arquivo_excel)
+
+        writer = pd.ExcelWriter(
+            arquivo_excel,
+            engine="openpyxl",
+            mode="a",
+            if_sheet_exists="overlay"
+        )
+
+        writer.book = book
+
+        sheet = book.active
+
+        startrow = sheet.max_row
+
+        novo_df.to_excel(
+            writer,
+            index=False,
+            header=False,
+            startrow=startrow
+        )
+
+        writer.close()
+
     else:
-        df = pd.DataFrame([nova_linha])
 
-    df.to_excel(ARQUIVO_EXCEL, index=False)
+        novo_df.to_excel(arquivo_excel, index=False)
 
-    return jsonify({"status": "ok"})
+    return "Salvo com sucesso!"
 
-
-# =========================
-# RUN
-# =========================
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=10000)
