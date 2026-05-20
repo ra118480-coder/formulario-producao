@@ -1,65 +1,79 @@
 <!DOCTYPE html>
 <html lang="pt-br">
-
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulário Produção</title>
 
-<meta charset="UTF-8">
+    <style>
 
-<title>Formulário Produção</title>
+        body{
+            font-family: Arial, sans-serif;
+            background: #f4f4f4;
+            margin:0;
+            padding:0;
+        }
 
-<style>
+        .container{
+            width: 90%;
+            max-width: 900px;
+            margin: 40px auto;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
 
-body{
-    font-family: Arial;
-    background:#f4f4f4;
-    padding:30px;
-}
+        h1{
+            text-align:center;
+            margin-bottom:30px;
+        }
 
-.container{
-    max-width:800px;
-    margin:auto;
-    background:white;
-    padding:30px;
-    border-radius:10px;
-    box-shadow:0 0 10px rgba(0,0,0,0.1);
-}
+        label{
+            font-weight:bold;
+            margin-top:15px;
+            display:block;
+        }
 
-label{
-    font-weight:bold;
-    margin-top:15px;
-    display:block;
-}
+        select,
+        textarea,
+        input{
+            width:100%;
+            padding:10px;
+            margin-top:5px;
+            border-radius:8px;
+            border:1px solid #ccc;
+            box-sizing:border-box;
+        }
 
-select,input,textarea{
-    width:100%;
-    padding:10px;
-    margin-top:5px;
-    border-radius:5px;
-    border:1px solid #ccc;
-}
+        textarea{
+            min-height:100px;
+        }
 
-button{
-    margin-top:20px;
-    padding:12px;
-    border:none;
-    background:#007bff;
-    color:white;
-    border-radius:5px;
-    cursor:pointer;
-}
+        button{
+            margin-top:20px;
+            padding:12px 20px;
+            border:none;
+            border-radius:8px;
+            background:#1f6feb;
+            color:white;
+            cursor:pointer;
+            font-size:16px;
+        }
 
-button:hover{
-    background:#0056b3;
-}
+        button:hover{
+            background:#174ea6;
+        }
 
-.bloco{
-    margin-top:20px;
-    padding:15px;
-    border:1px solid #ddd;
-    border-radius:8px;
-}
+        .bloco{
+            margin-top:30px;
+            padding:20px;
+            border:1px solid #ddd;
+            border-radius:10px;
+            background:#fafafa;
+        }
 
-</style>
+    </style>
 
 </head>
 
@@ -67,62 +81,257 @@ button:hover{
 
 <div class="container">
 
-<h2>Formulário de Produção</h2>
+    <h1>Formulário Produção</h1>
 
-<form id="formulario" enctype="multipart/form-data">
+    <form action="/salvar" method="POST" enctype="multipart/form-data">
 
-<label>Feira</label>
-<select id="feira" name="feira"></select>
+        <!-- FEIRA -->
 
-<label>Produto</label>
-<select id="produto" name="produto"></select>
+        <label>Feira</label>
 
-<label>Modulação</label>
-<select id="modulacao" name="modulacao"></select>
+        <select name="feira" id="feira" required>
+            <option value="">Selecione</option>
+        </select>
 
-<label>Versão</label>
-<select name="versao">
+        <!-- PRODUTO -->
 
-<option>V1</option>
-<option>V2</option>
-<option>V3</option>
-<option>V4</option>
-<option>V5</option>
+        <label>Produto</label>
 
-</select>
+        <select name="produto" id="produto" required>
+            <option value="">Selecione</option>
+        </select>
 
-<label>Fase</label>
-<select name="fase">
+        <!-- MODULAÇÃO -->
 
-<option>Montagem</option>
-<option>Espumação</option>
-<option>Tapeçaria</option>
+        <label>Modulação</label>
 
-</select>
+        <select name="modulacao" id="modulacao" required>
+            <option value="">Selecione</option>
+        </select>
 
-<label>Tipo</label>
-<select name="melhoria">
+        <!-- VERSÃO -->
 
-<option>Informacional</option>
-<option>Melhoria</option>
+        <label>Versão</label>
 
-</select>
+        <select name="versao" required>
 
-<div id="campos"></div>
+            <option value="">Selecione</option>
 
-<button type="button" onclick="adicionarCampo()">
-Adicionar descrição/foto
-</button>
+            <option value="V1">V1</option>
+            <option value="V2">V2</option>
+            <option value="V3">V3</option>
+            <option value="V4">V4</option>
+            <option value="V5">V5</option>
 
-<button type="submit">
-Salvar
-</button>
+        </select>
 
-</form>
+        <!-- FASE -->
+
+        <label>Fase</label>
+
+        <select name="fase" required>
+
+            <option value="">Selecione</option>
+
+            <option value="Montagem">Montagem</option>
+            <option value="Espumação">Espumação</option>
+            <option value="Tapeçaria">Tapeçaria</option>
+            <option value="Costura">Costura</option>
+
+        </select>
+
+        <!-- TIPO -->
+
+        <label>Tipo</label>
+
+        <select name="tipo" required>
+
+            <option value="">Selecione</option>
+
+            <option value="Informacional">Informacional</option>
+            <option value="Melhoria">Melhoria</option>
+
+        </select>
+
+        <!-- DESCRIÇÕES -->
+
+        <div id="descricoes">
+
+            <div class="bloco">
+
+                <label>Descrição 1</label>
+
+                <textarea
+                    name="descricao_1"
+                    required
+                ></textarea>
+
+                <label>Foto 1</label>
+
+                <input
+                    type="file"
+                    name="foto_1"
+                    accept="image/*"
+                >
+
+            </div>
+
+        </div>
+
+        <!-- BOTÃO ADICIONAR -->
+
+        <button
+            type="button"
+            onclick="adicionarDescricao()"
+        >
+            Adicionar descrição/foto
+        </button>
+
+        <br>
+
+        <!-- SALVAR -->
+
+        <button type="submit">
+            Salvar Formulário
+        </button>
+
+    </form>
 
 </div>
 
-<script src="/static/script.js"></script>
+<script>
+
+    let contador = 1;
+
+    // =========================
+    // CARREGAR FEIRAS
+    // =========================
+
+    fetch("/feiras")
+    .then(res => res.json())
+    .then(data => {
+
+        let feira = document.getElementById("feira");
+
+        data.forEach(item => {
+
+            feira.innerHTML += `
+                <option value="${item}">
+                    ${item}
+                </option>
+            `;
+
+        });
+
+    });
+
+    // =========================
+    // CARREGAR PRODUTOS
+    // =========================
+
+    document
+    .getElementById("feira")
+    .addEventListener("change", function(){
+
+        let feira = this.value;
+
+        fetch("/produtos/" + feira)
+        .then(res => res.json())
+        .then(data => {
+
+            let produto = document.getElementById("produto");
+
+            produto.innerHTML =
+                `<option value="">Selecione</option>`;
+
+            data.forEach(item => {
+
+                produto.innerHTML += `
+                    <option value="${item}">
+                        ${item}
+                    </option>
+                `;
+
+            });
+
+        });
+
+    });
+
+    // =========================
+    // CARREGAR MODULAÇÕES
+    // =========================
+
+    document
+    .getElementById("produto")
+    .addEventListener("change", function(){
+
+        let produto = this.value;
+
+        fetch("/modulacoes/" + produto)
+        .then(res => res.json())
+        .then(data => {
+
+            let modulacao =
+                document.getElementById("modulacao");
+
+            modulacao.innerHTML =
+                `<option value="">Selecione</option>`;
+
+            data.forEach(item => {
+
+                modulacao.innerHTML += `
+                    <option value="${item}">
+                        ${item}
+                    </option>
+                `;
+
+            });
+
+        });
+
+    });
+
+    // =========================
+    // ADICIONAR DESCRIÇÕES
+    // =========================
+
+    function adicionarDescricao(){
+
+        contador++;
+
+        let div =
+            document.getElementById("descricoes");
+
+        div.innerHTML += `
+
+            <div class="bloco">
+
+                <label>
+                    Descrição ${contador}
+                </label>
+
+                <textarea
+                    name="descricao_${contador}"
+                ></textarea>
+
+                <label>
+                    Foto ${contador}
+                </label>
+
+                <input
+                    type="file"
+                    name="foto_${contador}"
+                    accept="image/*"
+                >
+
+            </div>
+
+        `;
+
+    }
+
+</script>
 
 </body>
 </html>
